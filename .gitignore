@@ -119,6 +119,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venvLootius/
 
 # Spyder project settings
 .spyderproject
