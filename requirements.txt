@@ -1,3 +1,5 @@
--wxPython   4.2.0
--attrdict3  2.0.2
--requests   2.28.2
+-wxPython               4.2.0
+-attrdict3              2.0.2
+-requests               2.28.2
+-tailer                 0.4.1
+-win-unicode-console    0.5
