@@ -1,0 +1,30 @@
+CREATE TABLE "Weapons" (
+	"id"	INTEGER,
+	"name"	TEXT UNIQUE,
+	"type"	TEXT,
+	"decay"	REAL DEFAULT 0,
+	"ammo"	INTEGER DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE "Sights" (
+	"id"	INTEGER,
+	"name"	TEXT UNIQUE,
+	"type"	TEXT,
+	"decay"	REAL DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE "Scopes" (
+	"id"	INTEGER,
+	"name"	TEXT UNIQUE,
+	"type"	TEXT,
+	"decay"	REAL DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE "Amps" (
+	"id"	INTEGER,
+	"name"	TEXT UNIQUE,
+	"type"	TEXT,
+	"decay"	REAL DEFAULT 0,
+	"ammo"	INTEGER DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);

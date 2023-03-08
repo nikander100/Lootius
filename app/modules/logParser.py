@@ -70,7 +70,7 @@ class LootRow(BaseChatRow):
             self.value = Decimal(value)    
 
 class GlobalRow(BaseChatRow):
-    #add discovery/ath/tier?
+    #add discovery/ath/tier/isntance?
     def __init__(self, name, creature, value, location=None, hof=False):
         super().__init__()
         self.name = name

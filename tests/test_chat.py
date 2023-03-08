@@ -6,6 +6,7 @@ from app.modules.logParser import LogLine, parseLogLine
 class TestLogParsing(unittest.TestCase):
     def _internal(self, line, expected):
         testLogLine= parseLogLine(line)
+        # print(testLogLine)
         self.assertEqual(testLogLine, expected)
 
     def testParseSystemMessage(self):
