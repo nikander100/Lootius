@@ -20,6 +20,7 @@ mvc layout
 
 ---
 https://newville.github.io/wxmplot/examples.html for graphs \
+https://realpython.com/python-logging/ logging?\
 
 Dev Notes (tmp):\
 manage seperate hunting runs (exel format?)\
