@@ -9,6 +9,11 @@ import wx.adv
     so the main app stays nice and clean
 """
 if __name__ == '__main__':
+
+    """first precheck (all thins here)
+    second set errorhandling
+    third read config, do we want to use py-fa or lootnan way of config
+    on first load setup databases"""
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.
     from views.app import LootiusApp

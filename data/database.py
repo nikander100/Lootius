@@ -27,22 +27,22 @@ class SetupDatabase:
                 type = row[1]
                 try: decay = float(row[2])
                 except ValueError: decay = 0
-                if csvInput[1] == "Weapons" or csvInput[1] == "Amps":
+                if csvInput[1] == "weapons" or csvInput[1] == "amps":
                     try: ammo = int(row[3])
                     except ValueError: ammo = 0
-            if csvInput[1] == "Weapons" or csvInput[1] == "Amps":
+            if csvInput[1] == "weapons" or csvInput[1] == "amps":
                 InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay, ammo) VALUES('{name}','{type}',{decay},{ammo})"
             else:
                 InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay) VALUES('{name}','{type}',{decay})"
             dbCur.executescript(InsertQuery)
         fd.close()
 
-    def setupDatabase(dbFile):
+    def setupDatabase(self, dbFile):
         inputData = (
-            ("data/csv/weapons.csv", "Weapons"),
-            ("data/csv/sights.csv", "Sights"),
-            ("data/csv/scopes.csv", "Scopes"),
-            ("data/csv/amps.csv", "Amps"),
+            ("data/csv/weapons.csv", "weapons"),
+            ("data/csv/sights.csv", "sights"),
+            ("data/csv/scopes.csv", "scopes"),
+            ("data/csv/amps.csv", "amps"),
         )
         con = None
         try:
@@ -62,4 +62,6 @@ class SetupDatabase:
                 con.commit()
                 con.close()
 
-SetupDatabase.setupDatabase("data/test1.db")
+setupdb = SetupDatabase()
+setupdb.setupDatabase("data/test.db")
+
