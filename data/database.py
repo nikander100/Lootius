@@ -13,12 +13,36 @@ class SetupDatabase:
     def __init__(self):
         pass
 
+    def __getRawData(self, csvInput, dbCur):
+        fd = open(csvInput[0], "r")
+        csvFr = csv.reader(fd ,delimiter=";")
+        name = ''
+        type = ''
+        decay = ''
+        ammo = ''
+            
+        for row in csvFr:
+            for i in range(len(row)):
+                name = row[0]
+                type = row[1]
+                try: decay = float(row[2])
+                except ValueError: decay = 0
+                if csvInput[1] == "Weapons" or csvInput[1] == "Amps":
+                    try: ammo = int(row[3])
+                    except ValueError: ammo = 0
+            if csvInput[1] == "Weapons" or csvInput[1] == "Amps":
+                InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay, ammo) VALUES('{name}','{type}',{decay},{ammo})"
+            else:
+                InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay) VALUES('{name}','{type}',{decay})"
+            dbCur.executescript(InsertQuery)
+        fd.close()
+
     def setupDatabase(dbFile):
         inputData = (
-            ("data/weapons.csv", "Weapons"),
-            ("data/sights.csv", "Sights"),
-            ("data/scopes.csv", "Scopes"),
-            ("data/amps.csv", "Amps"),
+            ("data/csv/weapons.csv", "Weapons"),
+            ("data/csv/sights.csv", "Sights"),
+            ("data/csv/scopes.csv", "Scopes"),
+            ("data/csv/amps.csv", "Amps"),
         )
         con = None
         try:
@@ -34,32 +58,8 @@ class SetupDatabase:
                 cur.executescript(script)
                 for data in (inputData):
                     print(data)
-                    getRawData(data, cur)
+                    self.__getRawData(data, cur)
                 con.commit()
                 con.close()
 
-def getRawData(csvInput, dbCur):
-    fd = open(csvInput[0], "r")
-    csvFr = csv.reader(fd ,delimiter=";")
-    name = ''
-    type = ''
-    decay = ''
-    ammo = ''
-            
-    for row in csvFr:
-        for i in range(len(row)):
-            name = row[0]
-            type = row[1]
-            try: decay = float(row[2])
-            except ValueError: decay = 0
-            if csvInput[1] == "Weapons" or csvInput[1] == "Amps":
-                try: ammo = int(row[3])
-                except ValueError: ammo = 0
-        if csvInput[1] == "Weapons" or csvInput[1] == "Amps":
-            InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay, ammo) VALUES('{name}','{type}',{decay},{ammo})"
-        else:
-            InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay) VALUES('{name}','{type}',{decay})"
-        dbCur.executescript(InsertQuery)
-    fd.close()
-
-SetupDatabase.setupDatabase("data/test.db")
+SetupDatabase.setupDatabase("data/test1.db")
