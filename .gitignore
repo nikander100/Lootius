@@ -155,5 +155,11 @@ cython_debug/
 # VsCode
 .code-workspace
 
+# DbSchema
+.dbs
+.dbs.bak
+
 # Custom
 test.db
+testbak.db
+
