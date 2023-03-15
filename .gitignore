@@ -156,8 +156,8 @@ cython_debug/
 .code-workspace
 
 # DbSchema
-.dbs
-.dbs.bak
+*.dbs
+*.dbs.bak
 
 # Custom
 test.db
