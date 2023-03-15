@@ -11,6 +11,7 @@ from modules.baseModule import BaseModule
 from modules.logParser import BaseChatRow, CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
 # from ocr import screenshot_window
 
+# turn this into db table too?
 class HuntingRun(object):
     def __init__(self, timeStart: datetime, costPerShot: Decimal, costPerHeal: Decimal):
         self.timeStart = timeStart
@@ -73,7 +74,7 @@ class CombatModule(BaseModule):
         self.lootTable = None #table? maybe need to change to db connection
         self.runsTable = None #table? maybe need to change to db connection
         self.skillsTable = None #table? maybe need to change to db connection
-        self.enhancerTable = None #table? maybe need to change to db connection
+        self.enhancerTable = None #table? maybe need to change to db connection (part of weaponloadout)
         self.combatFields = {}
         self.lootField = {}
 

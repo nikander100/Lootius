@@ -3,3 +3,4 @@
 -requests               2.28.2
 -tailer                 0.4.1
 -win-unicode-console    0.5
+-SQLAlchemy             2.0.6

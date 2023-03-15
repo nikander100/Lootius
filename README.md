@@ -22,6 +22,8 @@ mvc layout
 https://newville.github.io/wxmplot/examples.html for graphs \
 https://realpython.com/python-logging/ logging?\
 
+dmg enhancer calc == base dmg +10% per tier enhancer
+
 Dev Notes (tmp):\
 manage seperate hunting runs (exel format?)\
 long term stats, split by cat, hunting mining crafting?\
