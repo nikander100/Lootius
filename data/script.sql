@@ -1,6 +1,6 @@
 CREATE TABLE "WeaponTypes" (
 	"id"	INTEGER,
-	"weaponType" TEXT,
+	"type" TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE TABLE "Weapons" (

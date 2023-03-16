@@ -49,11 +49,11 @@ class SetupDatabase:
         decay = ''
         ammo = ''
 
-        InsertQuery=f"INSERT INTO WeaponTypes(weaponType) Values('unknown')"
+        InsertQuery=f"INSERT INTO WeaponTypes(type) Values('unknown')"
         dbCur.executescript(InsertQuery)
-        InsertQuery=f"INSERT INTO WeaponTypes(weaponType) Values('ranged')"
+        InsertQuery=f"INSERT INTO WeaponTypes(type) Values('ranged')"
         dbCur.executescript(InsertQuery)
-        InsertQuery=f"INSERT INTO WeaponTypes(weaponType) Values('melee')"
+        InsertQuery=f"INSERT INTO WeaponTypes(type) Values('melee')"
         dbCur.executescript(InsertQuery)
         for row in reader:
             print(row)
