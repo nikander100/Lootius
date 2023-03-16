@@ -160,5 +160,5 @@ data/*.dbs
 data/*.dbs.bak
 
 # Custom
-data/*.db
+lootius/database/*.db
 
