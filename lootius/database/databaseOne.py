@@ -22,5 +22,5 @@ class SetupDatabase:
         finally:
             lootiusDB.metadata.create_all(engine)
 
-SetupDatabase.setupDatabse("/data/lootiusTest.db")
+SetupDatabase.setupDatabse("/lootius/database/lootiusTest.db")
 # SetupDatabase._dropDatabase()
