@@ -1,6 +1,9 @@
 # Lootius
  Entropia universe Loot tracker, with more features soonTM
 
+after isntalli8ng wxpython with python 3.11.1
+fix this manually https://github.com/wxWidgets/Phoenix/issues/2297 \
+on windows venv set pypath http://chrisspearswebdev.blogspot.com/2014/08/setting-pythonpath-with-powershell.html
 
 mvc layout
 - Project Lootius (repo)\
