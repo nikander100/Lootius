@@ -1,6 +1,7 @@
 import sqlite3
 import pandas, time, sqlalchemy, typing, sys
 from lootius.models.databaseModel import *
+from sqlalchemy.orm import sessionmaker
 from sqlite3 import Error
 
 class SetupDatabase:
@@ -14,6 +15,14 @@ class SetupDatabase:
         
 
     def __populateDatabase(self, engine):
+        Session = sessionmaker(engine)
+        
+        # Populate weaponType
+        with Session.begin() as session:
+            wType1, wType2, wType3 = (WeaponTypes() for _ in range(3))
+            wType1.type = "unknown"; session.add(wType1)
+            wType2.type = "ranged"; session.add(wType2)
+            wType3.type = "melee"; session.add(wType3)
 
         # Populate weapons
         weaponsCSV = "./data/csv/weapons.csv"
