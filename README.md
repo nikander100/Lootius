@@ -23,7 +23,12 @@ mvc layout
 
 ---
 https://newville.github.io/wxmplot/examples.html for graphs \
-https://realpython.com/python-logging/ logging?\
+https://realpython.com/python-logging/ logging?
+
+database stuffs:\
+https://stackoverflow.com/a/70238438
+
+---
 
 dmg enhancer calc == base dmg +10% per tier enhancer
 
@@ -38,5 +43,7 @@ team tracker, loot split calc etc. screenshots.\
 skill tracker / damage tracker.\
 decay values in tuples/unmutable database, to counter eco tampering.\
 
+keep in mind crit dmg +1% and +2% and ranger scope\
+relaodd speed from rings etc to show dps on stream overlay later\
 long term goals:\
 web based service if enough ned for it, including accounts etc.\
