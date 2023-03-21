@@ -1,0 +1,12 @@
+Name;Type;Decay;AbsorbPercent
+Mayhem M-Matrix Alpha (L);Melee Absorber;0.019
+Mayhem M-Matrix Beta (L);Melee Absorber;" ";
+Mayhem M-Matrix Delta (L);Melee Absorber;" ";
+Mayhem M-Matrix Gamma (L);Melee Absorber;" ";
+ArMatrix Extender P10 (L);Absorber;0.001;10
+ArMatrix Extender P15 (L);Absorber;0.001;15
+ArMatrix Extender P20 (L);Absorber;0.001;20
+Karona''s Extender P20 (L);Absorber;0.0001;20
+Mayhem Extender P20;Absorber;0.0001;20
+Mayhem Extender P25;Absorber;0.0001;25
+Mayhem Extender P30 (L);Absorber;0.001;30
