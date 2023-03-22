@@ -13,17 +13,36 @@ class SetupDatabase:
         engine = sqlalchemy.create_engine("sqlite+pysqlite:///lootius/database/lootiusTest.db", echo=True)
         lootiusDB.metadata.drop_all(engine)
 
+    def __populateEnhancerTypeTable(self, engine):
+        Session = sessionmaker(engine)
+        from lootius.models.databaseModel import EnhancerTypes
+        with Session.begin() as session:
+            typeOne, typeTwo, typeThree = (EnhancerTypes() for _ in range(3))
+            typeOne.type = "weapon"
+            typeTwo.type = "healing"
+            typeThree.type = "mining"
+            session.add_all([typeOne, typeTwo, typeThree])
+    
     def __populateWeaponTypeTable(self, engine):
         Session = sessionmaker(engine)
         from lootius.models.databaseModel import WeaponTypes
         with Session.begin() as session:
-            typeIdOne, typeIdTwo, typeIdThree, typeIdFour, typeIdFive = (WeaponTypes() for _ in range(5))
-            typeIdOne.type = "all"
-            typeIdTwo.type = "laser"
-            typeIdThree.type = "blp"
-            typeIdFour.type = "mindforce"
-            typeIdFive.type = "melee"
-            session.add_all([typeIdOne, typeIdTwo, typeIdThree, typeIdFour, typeIdFive])
+            typeOne, typeTwo, typeThree, typeFour, typeFive = (WeaponTypes() for _ in range(5))
+            typeOne.type = "all"
+            typeTwo.type = "laser"
+            typeThree.type = "blp"
+            typeFour.type = "mindforce"
+            typeFive.type = "melee"
+            session.add_all([typeOne, typeTwo, typeThree, typeFour, typeFive])
+
+    def __populateEnhancerEffectTable(self, engine):
+        from lootius.models.databaseModel import EnhancerEffectTypes
+        enhancerTypesCSV = "./data/csv/enhancerEffects.csv"
+        df = pandas.read_csv(enhancerTypesCSV, sep=";")
+        df = df.rename(columns={"Name":"name", "effectAmount":"amount"})
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=engine, name=EnhancerEffectTypes.__tablename__, if_exists="append", index=False)
 
 
     def __populateWeaponTable(self, engine):
@@ -88,26 +107,37 @@ class SetupDatabase:
         df = df.fillna(0)
         df.to_sql(con=engine, name=WeaponAbsorbers.__tablename__, if_exists="append", index=False)
 
+    def __populateEnhancerTable(self, engine):
+        from lootius.models.databaseModel import Enhancers
+        enhancersCSV = "./data/csv/enhancers.csv"
+        df = pandas.read_csv(enhancersCSV, sep=";")
+        df = df.rename(columns={"Name":"name", "Type":"enhancerTypeID"})
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=engine, name=Enhancers.__tablename__, if_exists="append", index=False)
 
     def __populateDatabase(self, engine):
         
         # Populate weaponType
         self.__populateWeaponTypeTable(engine)
-
+        # Populate enhancerType
+        self.__populateEnhancerTypeTable(engine)
+        # Populate enhancherEffect
+        self.__populateEnhancerEffectTable(engine)
         # Populate weapons
         self.__populateWeaponTable(engine)
-
         # Populate sights
         self.__populateSightsTable(engine)
-
         # Populate scopes
         self.__populateScopesTable(engine)
-
         # Populate amps
         self.__populateWeaponAmpsTable(engine)
-
         # Populate absorbers
         self.__populateAbsorberTable(engine)
+        # Populate enhancers
+        self.__populateEnhancerTable(engine)
+
+
 
 
     def setupDatabase(self, dbFilePath):
