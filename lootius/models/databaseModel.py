@@ -112,7 +112,8 @@ class EnhancerEffectTypes(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[int] = mapped_column()
-    amount: Mapped[float] = mapped_column(default=0)
+    decayAmount: Mapped[float] = mapped_column(default=0)
+    bonusAmount: Mapped[float] = mapped_column(default=0)
 
 class EnhancerTypes(Base):
     __tablename__ = "EnhancerTypes"

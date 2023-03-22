@@ -39,7 +39,7 @@ class SetupDatabase:
         from lootius.models.databaseModel import EnhancerEffectTypes
         enhancerTypesCSV = "./data/csv/enhancerEffects.csv"
         df = pandas.read_csv(enhancerTypesCSV, sep=";")
-        df = df.rename(columns={"Name":"name", "effectAmount":"amount"})
+        df = df.rename(columns={"Name":"name", "DecayAmount":"decayAmount", "BonusAmount":"bonusAmount"})
         df = df.replace(r'^\s*$', 0, regex=True)
         df = df.fillna(0)
         df.to_sql(con=engine, name=EnhancerEffectTypes.__tablename__, if_exists="append", index=False)
