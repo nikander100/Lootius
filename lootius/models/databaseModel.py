@@ -107,38 +107,63 @@ class WeaponLoadout(Base):
 Enhancer tables
 """
 
-class EnhancerEffectTypes(Base):
-    __tablename__ = "EnhancerEffectTypes"
+class EnhancerEffects(Base):
+    __tablename__ = "EnhancerEffects"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[int] = mapped_column()
     decayAmount: Mapped[float] = mapped_column(default=0)
     bonusAmount: Mapped[float] = mapped_column(default=0)
 
+class EnhancerNames(Base):
+    __tablename__ = "EnhancerNames"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(TEXT)
+
+class EnhancerTypeNames(Base):
+    __tablename__ = "EnhancerTypeNames"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(TEXT)
+
 class EnhancerTypes(Base):
     __tablename__ = "EnhancerTypes"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[str] = mapped_column(TEXT)
+
+class EnhancerClass(Base):
+    __tablename__ = "EnhancerClass"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[str] =  mapped_column(TEXT)
-
-class Enhancers(Base):
-    __tablename__ = "Enhancers"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[int] = mapped_column(TEXT)
+    enhancerNameID: Mapped[int] = mapped_column(ForeignKey("EnhancerNames.id"))
+    enhancerTypeNameID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypeNames.id"))
+    enhancerEffectID: Mapped[int] = mapped_column(ForeignKey("EnhancerEffects.id"), default=1)
     enhancerTypeID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypes.id"))
+
+class EnhancerLoadout(Base):
+    __tablename__ = "EnhancerLoadout"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    enhancerTypeID: Mapped[int] = mapped_column(ForeignKey("EnhancerClass.id"))
+    amount: Mapped[int] = mapped_column(default=0)
 
 class Sockets(Base):
     __tablename__ = "Sockets"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    enhancerOneID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerTwoID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerThreeID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerFourID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerFiveID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerSixID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerSevenID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerEightID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerNineID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
-    enhancerTenID: Mapped[int] = mapped_column(ForeignKey("Enhancers.id"))
+    enhancerOneID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerTwoID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerThreeID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerFourID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerFiveID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerSixID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerSevenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerEightID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerNineID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerTenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+
+    """
+    Combat moddule tables
+    """
+    

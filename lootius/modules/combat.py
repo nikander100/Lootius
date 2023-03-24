@@ -3,13 +3,21 @@ from datetime import datetime
 import time
 from decimal import Decimal
 from typing import List
-import keyboard
 import threading
 import os
+import sqlalchemy
+from sqlalchemy.orm import sessionmaker
 
 from modules.baseModule import BaseModule
 from modules.logParser import BaseChatRow, CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
 # from ocr import screenshot_window
+
+#dbfilepath to be set in config
+dbFilePath = "/lootius/database/lootiusTest.db"
+"C://Users/ndvds/Documents/GitHub/Lootius/lootius/database/lootiusTest.db"
+LootiusDB = sqlalchemy.create_engine(f"sqlite+pysqlite://{dbFilePath}", echo=True)
+#use with DBSession.begin() as ... to interact with db
+DBSession = sessionmaker(LootiusDB)
 
 # turn this into db table too?
 class HuntingRun(object):
@@ -55,9 +63,6 @@ class HuntingRun(object):
         # Misc Stats
         self.enhancerBreaks = defaultdict(int)
         self.skillgains = defaultdict(int)
-
-
-
 
 
 
