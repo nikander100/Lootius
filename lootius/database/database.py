@@ -1,112 +1,185 @@
 import sqlite3
+import pandas, time, sqlalchemy, typing, sys
+from lootius.models.databaseModel import Base
+from sqlalchemy.orm import sessionmaker
 from sqlite3 import Error
-import csv, time
 
-# Updates the database with new data from wiki (to be made)
-class UpdateDatabse:
-    def __init__(self):
-        pass
-
-# First time setup of the local database.
-"""To be put into documentation"""
 class SetupDatabase:
+    engine = None
+    Session = None
     def __init__(self):
         pass
+    
+    @classmethod
+    def _dropDatabase(self):
+        lootiusDB = Base()
+        self.engine = sqlalchemy.create_engine("sqlite+pysqlite:///lootius/database/lootiusTest.db", echo=True)
+        lootiusDB.metadata.drop_all(self.engine)
 
-    def __getRawDatabakup(self, csvInput, dbCur):
-        fd = open(csvInput[0], "r")
-        reader = csv.reader(fd ,delimiter=";")
-        name = ''
-        type = ''
-        decay = ''
-        ammo = ''
-            
-        for row in reader:
-            for i in range(len(row)):
-                print(row)
-                name = row[0]
-                type = row[1]
-                try: decay = float(row[2])
-                except ValueError: decay = 0
-                if csvInput[1] == "weapons" or csvInput[1] == "amps":
-                    try: ammo = int(row[3])
-                    except ValueError: ammo = 0
-            if csvInput[1] == "weapons" or csvInput[1] == "amps":
-                InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay, ammo) VALUES('{name}','{type}',{decay},{ammo})"
-            else:
-                InsertQuery=f"INSERT INTO {csvInput[1]} (name, type, decay) VALUES('{name}','{type}',{decay})"
-            dbCur.executescript(InsertQuery)
-        fd.close()
+    def __populateEnhancerTypeTable(self):
+        Session = sessionmaker(self.engine)
+        from lootius.models.databaseModel import EnhancerTypes
+        with Session.begin() as session:
+            typeOne, typeTwo, typeThree = (EnhancerTypes() for _ in range(3))
+            typeTwo.type = "healing"
+            typeThree.type = "mining"
+            typeOne.type = "weapon"
+            session.add_all([typeOne, typeTwo, typeThree])
 
-    def __getRawData(self, csvInput, dbCur):
-        fd = open(csvInput[0], "r")
-        reader = csv.reader(fd ,delimiter=";")
-        next(reader)
-        name = ''
-        type = ''
-        damage = ''
-        firerate = ''
-        decay = ''
-        ammo = ''
+    def __populateEnhancerNameTable(self):
+        Session = sessionmaker(self.engine)
+        from lootius.models.databaseModel import EnhancerNames
+        with Session.begin() as session:
+            nameOne, nameTwo, nameThree, nameFour = (EnhancerNames() for _ in range(4))
+            nameOne.name = "Medical Tool"
+            nameTwo.name = "Mining Excavator"
+            nameThree.name = "Mining Finder"
+            nameFour.name = "Weapon"
+            session.add_all([nameOne, nameTwo, nameThree, nameFour])
 
-        InsertQuery=f"INSERT INTO WeaponTypes(type) Values('unknown')"
-        dbCur.executescript(InsertQuery)
-        InsertQuery=f"INSERT INTO WeaponTypes(type) Values('ranged')"
-        dbCur.executescript(InsertQuery)
-        InsertQuery=f"INSERT INTO WeaponTypes(type) Values('melee')"
-        dbCur.executescript(InsertQuery)
-        for row in reader:
-            print(row)
-            name = row[0]
-            try:
-                if row[1] == "Melee":   type = int(3)
-                else:                   type = int(2)
-            except ValueError: type = int(1)
-            try: damage = int(row[2])
-            except ValueError: damage = 0
-            try: firerate = int(row[3])
-            except ValueError: damage = 0
-            try: decay = float(row[4])
-            except ValueError: decay = 0
-            try: ammo = int(row[5])
-            except ValueError: ammo = 0
+    def __populateEnhancerTypeNameTable(self):
+        Session = sessionmaker(self.engine)
+        from lootius.models.databaseModel import EnhancerTypeNames
+        with Session.begin() as session:
+            name = [EnhancerTypeNames() for i in range(8)]
+            name[0].name = "Economy"
+            name[1].name = "Heal"
+            name[2].name = "Speed"
+            name[3].name = "Depth"
+            name[4].name = "Range"
+            name[5].name = "Accuracy"
+            name[6].name = "Damage"
+            name[7].name = "Skill Modification"
+            session.add_all([name[0], name[1], name[2], name[3], name[4], name[5], name[6], name[7]])
 
-            InsertQuery=f"INSERT INTO {csvInput[1]} (name, damage, firerate, decay, ammoBurn, weaponTypeID) VALUES('{name}',{damage},{firerate},{decay},{ammo},'{type}')"
-            print(InsertQuery)
-            dbCur.executescript(InsertQuery)
-        fd.close()
+    def __populateEnhancerClassTable(self):
+        enhancerClassCSV = "./data/csv/enhancerClass.csv"
+        from lootius.models.databaseModel import EnhancerClass
+        df = pandas.read_csv(enhancerClassCSV, sep=";")
+        df = df.rename(columns={"SkillName":"enhancerTypeNameID", "Effect":"enhancerEffectID", "Type":"enhancerTypeID", "TypeName":"enhancerNameID"})
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=self.engine, name=EnhancerClass.__tablename__, if_exists="append", index=False)
+    
+    def __populateEnhancerEffectsTable(self):
+        from lootius.models.databaseModel import EnhancerEffects
+        enhancerEffectsCSV = "./data/csv/enhancerEffects.csv"
+        df = pandas.read_csv(enhancerEffectsCSV, sep=";")
+        df = df.rename(columns={"DecayAmount":"decayAmount", "BonusAmount":"bonusAmount"})
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=self.engine, name=EnhancerEffects.__tablename__, if_exists="append", index=False)
+    
+    def __populateWeaponTypeTable(self):
+        Session = sessionmaker(self.engine)
+        from lootius.models.databaseModel import WeaponTypes
+        with Session.begin() as session:
+            typeOne, typeTwo, typeThree, typeFour, typeFive = (WeaponTypes() for _ in range(5))
+            typeOne.type = "all"
+            typeTwo.type = "laser"
+            typeThree.type = "blp"
+            typeFour.type = "mindforce"
+            typeFive.type = "melee"
+            session.add_all([typeOne, typeTwo, typeThree, typeFour, typeFive])
 
-    def setupDatabase(self, dbFile):
-        inputData = (
-            ("data/csv/weapons.csv", "Weapons"),
-            ("data/csv/sights.csv", "Sights"),
-            # ("data/csv/scopes.csv", "Scopes"),
-            # ("data/csv/amps.csv", "Amps"),
-        )
-        con = None
-        
-        # Create database
+
+    def __populateWeaponTable(self):
+        from lootius.models.databaseModel import Weapons
+        weaponsCSV = "./data/csv/weapons.csv"
+        laserSet = {"laser", "gauss"}
+        blpSet = {"blp", "plasma"}
+        mindforceSet = {"cryogenic", "electric", "pyro"}
+        meleeSet = {"axes", "clubs", "longblades", "power fist", "shortblades", "whip"}
+        convert = (lambda x: 5 if str(x).lower() in meleeSet \
+                    else 4 if str(x).lower() in mindforceSet \
+                    else 3 if str(x).lower() in blpSet \
+                    else 2 if str(x).lower() in laserSet \
+                    else 1)
+        df = pandas.read_csv(weaponsCSV, sep=";", converters={"Type":convert})
+        df = df.rename(columns={"Name":"name", "Type":"weaponTypeID", "Damage":"damage", "Attacks":"firerate", "Decay":"decay", "Ammo":"ammoBurn"})
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=self.engine, name=Weapons.__tablename__, if_exists="append", index=False)
+
+    def __populateSightsTable(self):
+        from lootius.models.databaseModel import Sights
+        sightsCSV = "./data/csv/sights.csv"
+        df = pandas.read_csv(sightsCSV, sep=";")
+        df = df.rename(columns={"Name":"name", "Type":"weaponTypeID", "Decay":"decay"}) # same as in scopes
+        df[["weaponTypeID"]] = df[["weaponTypeID"]].replace("Sight", 2) # same as in scopes
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=self.engine, name=Sights.__tablename__, if_exists="append", index=False)
+
+    def __populateScopesTable(self):
+        from lootius.models.databaseModel import Scopes
+        scopesCSV = "./data/csv/scopes.csv"
+        df = pandas.read_csv(scopesCSV, sep=";")
+        df = df.rename(columns={"Name":"name", "Type":"weaponTypeID", "Decay":"decay"}) # same as in sights
+        df[["weaponTypeID"]] = df[["weaponTypeID"]].replace("Scope", 2) # same as in sights
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=self.engine, name=Scopes.__tablename__, if_exists="append", index=False)
+
+    def __populateWeaponAmpsTable(self):
+        from lootius.models.databaseModel import WeaponAmps
+        ampsCSV = "./data/csv/weaponAmps.csv"
+        convert = (lambda x: 5 if str(x).lower() == "melee amp" \
+                    else 4 if str(x).lower() in "mf amp" \
+                    else 3 if str(x).lower() in "blp amp" \
+                    else 2 if str(x).lower() in "energy amp" \
+                    else 1)
+        df = pandas.read_csv(ampsCSV, sep=";", converters={"Type":convert})
+        df = df.rename(columns={"Name":"name", "Type":"weaponTypeID", "Decay":"decay", "Ammo":"ammoBurn"}) #
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=self.engine, name=WeaponAmps.__tablename__, if_exists="append", index=False)
+
+    def __populateAbsorberTable(self):
+        from lootius.models.databaseModel import WeaponAbsorbers
+        absorbersCSV = "./data/csv/absorbers.csv"
+        convert = (lambda x: 5 if str(x).lower() == "melee absorber" else 1)
+        df = pandas.read_csv(absorbersCSV, sep=";", converters={"Type":convert})
+        df = df.rename(columns={"Name":"name", "Type":"weaponTypeID", "Decay":"decay", "AbsorbPercent":"absorbPercent"})
+        df = df.replace(r'^\s*$', 0, regex=True)
+        df = df.fillna(0)
+        df.to_sql(con=self.engine, name=WeaponAbsorbers.__tablename__, if_exists="append", index=False)
+
+    def __populateDatabase(self):
+        self.__populateWeaponTypeTable(self.engine)
+        self.__populateEnhancerClassTable(self.engine)
+        self.__populateEnhancerTypeNameTable(self.engine)
+        self.__populateEnhancerNameTable(self.engine)
+        self.__populateEnhancerTypeTable(self.engine)
+        self.__populateEnhancerEffectsTable(self.engine)
+        self.__populateWeaponTable(self.engine)
+        self.__populateSightsTable(self.engine)
+        self.__populateScopesTable(self.engine)
+        self.__populateWeaponAmpsTable(self.engine)
+        self.__populateAbsorberTable(self.engine)
+
+
+
+    @classmethod
+    def setupDatabase(self, dbFilePath):
+        lootiusDB = Base()
         try:
-            con = sqlite3.connect(dbFile)
+            self.engine = sqlalchemy.create_engine(f"sqlite+pysqlite://{dbFilePath}", echo=True)
         except Error as e:
-            print(e)  ;"""log to errors"""
+            print(e)  ;"""log to errors, have to find out what the error return is from alchemy"""
         finally:
-            if con:
-                cur = con.cursor()
+            lootiusDB.metadata.create_all(self.engine)
+            self.__populateDatabase(self)
+            self.Session = sessionmaker(self.engine)
+    
+    #make this in a way to return a new session object from existing Session in the class
+    @classmethod
+    def getNewSession(self):
+        return (sessionmaker(self.engine))
 
-                # Setup database
-                with open("data/script.sql", "r") as fd:
-                    script = fd.read()
-                cur.executescript(script)
 
-                # Populate databse
-                for data in (inputData):
-                    print(data)
-                    self.__getRawData(data, cur)
-                    break
-                con.commit()
-                con.close()
 
-setupdb = SetupDatabase()
-setupdb.setupDatabase("data/test.db")
-
+# testDB = SetupDatabase()
+# testDB._dropDatabase()
+# # time.sleep(1)
+# testDB.setupDatabase("/lootius/database/lootiusTest.db")
