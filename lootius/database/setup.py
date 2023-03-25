@@ -1,21 +1,13 @@
-import sqlite3
 import pandas, time, sqlalchemy, typing, sys
 from lootius.models.databaseModel import Base
 from sqlalchemy.orm import sessionmaker
 from sqlite3 import Error
 
-class SetupDatabase:
+class Setup:
     engine = None
-    Session = None
     def __init__(self):
         pass
     
-    @classmethod
-    def _dropDatabase(self):
-        lootiusDB = Base()
-        self.engine = sqlalchemy.create_engine("sqlite+pysqlite:///lootius/database/lootiusTest.db", echo=True)
-        lootiusDB.metadata.drop_all(self.engine)
-
     def __populateEnhancerTypeTable(self):
         Session = sessionmaker(self.engine)
         from lootius.models.databaseModel import EnhancerTypes
@@ -158,28 +150,15 @@ class SetupDatabase:
         self.__populateWeaponAmpsTable(self.engine)
         self.__populateAbsorberTable(self.engine)
 
-
-
     @classmethod
-    def setupDatabase(self, dbFilePath):
-        lootiusDB = Base()
+    def run(self, dbFilePath):
         try:
-            self.engine = sqlalchemy.create_engine(f"sqlite+pysqlite://{dbFilePath}", echo=True)
+            print(dbFilePath)
+            self.engine = sqlalchemy.create_engine(f"sqlite+pysqlite:///{dbFilePath}", echo=True)
         except Error as e:
             print(e)  ;"""log to errors, have to find out what the error return is from alchemy"""
         finally:
+            lootiusDB = Base()
             lootiusDB.metadata.create_all(self.engine)
             self.__populateDatabase(self)
             self.Session = sessionmaker(self.engine)
-    
-    #make this in a way to return a new session object from existing Session in the class
-    @classmethod
-    def getNewSession(self):
-        return (sessionmaker(self.engine))
-
-
-
-# testDB = SetupDatabase()
-# testDB._dropDatabase()
-# # time.sleep(1)
-# testDB.setupDatabase("/lootius/database/lootiusTest.db")

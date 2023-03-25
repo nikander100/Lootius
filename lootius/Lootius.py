@@ -14,16 +14,24 @@ if __name__ == '__main__':
     import wx
     #possibly not needed here
     import wx.adv 
+    import sys
+    from os.path import realpath, join, dirname, abspath
+    from os import path
 
-    from database.database import SetupDatabase
+    from database import db
     from models.databaseModel import WeaponTypes
-    SetupDatabase._dropDatabase()
-    SetupDatabase.setupDatabase("/lootius/database/lootiusTest.db")
-    Session = SetupDatabase.getNewSession()
-    with Session.begin() as session:
-        tmp = WeaponTypes()
-        tmp.type = "testing"
-        session.add(tmp)
+
+    # Setup Db
+    dbPath = realpath(join(dirname(abspath(__file__)), "./database/", "lootiusTest.db"))
+    if path.exists(dbPath) == False:
+        db.Setup.run(dbPath)
+    else:
+        print("path exists")
+    Session = db.DB.getSession()
+    # with Session.begin() as session:
+    #     tmp = WeaponTypes()
+    #     tmp.type = "testing"
+    #     session.add(tmp)
 
 
     # When this module is run (not imported) then create the app, the
