@@ -168,4 +168,4 @@ data/*.dbs.bak
 
 # Custom
 lootius/database/*.db
-
+saphy.*
