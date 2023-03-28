@@ -19,20 +19,14 @@ if __name__ == '__main__':
     from os import path
 
     from database import db
-    from models.databaseModel import WeaponTypes
 
     # Setup Db
     dbPath = realpath(join(dirname(abspath(__file__)), "./database/", "lootiusTest.db"))
     if path.exists(dbPath) == False:
         db.Setup.run(dbPath)
     else:
-        print("path exists")
-    Session = db.DB.getSession()
-    # with Session.begin() as session:
-    #     tmp = WeaponTypes()
-    #     tmp.type = "testing"
-    #     session.add(tmp)
-
+        print("db exists")
+    # Session = db.DB.getSession()
 
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.

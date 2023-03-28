@@ -1,10 +1,16 @@
 import wx
 import wx.adv 
+import webbrowser
 
-from views.mainMenuBar import mainMenuBar
 from modules.logParser import ChatLogParser
+from views.mainMenuBar import mainMenuBar
 from views.preferenceDialog import PreferenceDialog
+from views.weaponLoadoutDialog import WeaponLoadoutDialog
 
+
+"""
+TODO Add min size for frame
+"""
 class LootiusFrame(wx.Frame):
 
     def __init__(self, title="Lootius"):
@@ -17,7 +23,7 @@ class LootiusFrame(wx.Frame):
         self.chatLogParser = ChatLogParser(self)
 
         # create a panel in the frame
-        pnl = wx.Panel(self);
+        # pnl = wx.Panel(self);
 
         # Add menubar
         self.SetMenuBar(mainMenuBar(self))
@@ -44,6 +50,14 @@ class LootiusFrame(wx.Frame):
         with PreferenceDialog(self) as dlg:
             dlg.ShowModal()
     
+    def onShowWeaponLoadoutDialog(self, event):
+        with WeaponLoadoutDialog(self) as dlg:
+            dlg.ShowModal()
+
+    @staticmethod
+    def goWiki(event):
+        webbrowser.open("https://github.com/nikander100/Lootius/tree/dev")
+    
     def registerMenu(self):
         menuBar = self.GetMenuBar();
         # Quit
@@ -52,6 +66,12 @@ class LootiusFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.ShowAboutBox, id=wx.ID_ABOUT)
         # Preference dialog
         self.Bind(wx.EVT_MENU, self.OnShowPreferenceDialog, id=wx.ID_PREFERENCES)
+        # Weapon loadout dialog
+        self.Bind(wx.EVT_MENU, self.onShowWeaponLoadoutDialog, id=menuBar.weaponLoadoutEditorID)
+
+
+        # goto Github (gonna  be wiki link but for now repo link)
+        self.Bind(wx.EVT_MENU, self.goWiki, id=menuBar.wikiID)
 
 
         # # put some text with a larger bold font on it
