@@ -166,6 +166,10 @@ cython_debug/
 data/*.dbs
 data/*.dbs.bak
 
+# wxGladde
+*.wxg*
+wxglade_*
+
 # Custom
 lootius/database/*.db
 saphy.*
