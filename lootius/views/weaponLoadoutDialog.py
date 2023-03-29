@@ -5,30 +5,20 @@ import wx
 TODO Add min size for frame
 """
 class WeaponLoadoutDialog(wx.Dialog):
-
     def __init__(self, parent):
-        super().__init__(parent, id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER)
-        self.SetTitle("Lootius - " + "Weapon Loadout");
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        super().__init__(parent, id=wx.ID_ANY, title=(f"{parent.title} - Add Weapon Loadout"), size=(390, 525), style=wx.CAPTION|wx.CLOSE_BOX)
+        # self.SetBackgroundColour(wx.NullColour)
 
-        self.m_staticline2 = wx.StaticLine(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL)
-        mainSizer.Add(self.m_staticline2, 0, wx.EXPAND, 5)
+        # Main frame in window.
+        weaponLoadout = wx.BoxSizer(wx.VERTICAL)
 
-        """to be looked at"""
-        btnSizer = wx.BoxSizer(wx.HORIZONTAL)
-        btnSizer.AddStretchSpacer()
+        # Weapon select row
+        weaponInput = wx.BoxSizer(wx.HORIZONTAL)
 
-        # cancel button
-        self.btnCancel = wx.Button(self, wx.ID_ANY, "Cancel", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.btnCancel.Bind(wx.EVT_BUTTON, self.on_close)
-        btnSizer.Add(self.btnCancel, 0, wx.RIGHT, 2)
+        weaponInputName = wx.StaticText(self, wx.ID_ANY, "Weapon:", style=wx.ALIGN_LEFT)
+        weaponInput.Add(weaponInputName, 1, wx.ALIGN_CENTER_VERTICAL|wx.FIXED_MINSIZE|wx.LEFT|wx.RIGHT, 5)
+        self.weaponInputBox = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
+        weaponInput.Add(self.weaponInputBox, 5, wx.EXPAND|wx.LEFT|wx.RIGHT, 5)
 
-        # save button
-        self.btnOK = wx.Button(self, wx.ID_ANY, "Save", wx.DefaultPosition, wx.DefaultSize, 0)
-        btnSizer.Add(self.btnOK, 0, wx.RIGHT, 5)
 
-        mainSizer.Add(btnSizer, 0, wx.EXPAND|wx.TOP|wx.BOTTOM, 5)
-        self.SetSizer(mainSizer)
-
-    def on_close(self, event):
-        self.Close()
+        weaponLoadout.Add(weaponInput, 0, wx.BOTTOM|wx.EXPAND|wx.TOP, 5)

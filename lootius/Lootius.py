@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     from database import db
 
-    # Setup Db
+    # Setup Db, only do on first run, need to set to config var later.
     dbPath = realpath(join(dirname(abspath(__file__)), "./database/", "lootiusTest.db"))
     if path.exists(dbPath) == False:
         db.Setup.run(dbPath)

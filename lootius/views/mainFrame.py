@@ -6,6 +6,7 @@ from modules.logParser import ChatLogParser
 from views.mainMenuBar import mainMenuBar
 from views.preferenceDialog import PreferenceDialog
 from views.weaponLoadoutDialog import WeaponLoadoutDialog
+# from data.wxglade_out import WeaponLoadoutDialog
 
 
 """
@@ -13,11 +14,11 @@ TODO Add min size for frame
 """
 class LootiusFrame(wx.Frame):
 
-    def __init__(self, title="Lootius"):
+    def __init__(self, title="Lootius", size=(320, 160, 1280, 720)):
         # ensure the parent's __init__ is called
         self.title = title
         super().__init__(None, wx.ID_ANY, self.title)
-        self.SetSize(320, 160, 1280, 720)
+        self.Size = size
 
         # Modules
         self.chatLogParser = ChatLogParser(self)
