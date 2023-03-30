@@ -34,5 +34,6 @@ if __name__ == '__main__':
     lootius = LootiusApp()
     from views.mainFrame import LootiusFrame
     frm = LootiusFrame()
+    lootius.SetTopWindow(frm)
     frm.Show();
     lootius.MainLoop();

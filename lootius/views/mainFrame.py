@@ -6,7 +6,6 @@ from modules.logParser import ChatLogParser
 from views.mainMenuBar import mainMenuBar
 from views.preferenceDialog import PreferenceDialog
 from views.weaponLoadoutDialog import WeaponLoadoutDialog
-# from data.wxglade_out import WeaponLoadoutDialog
 
 
 """
