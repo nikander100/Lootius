@@ -1,4 +1,6 @@
 # Lootius
+# If you came to look for work progress check the dev branch!
+# Won't be merging into main until first working state.
  Entropia universe Loot tracker, with more features soonTM
 
 
