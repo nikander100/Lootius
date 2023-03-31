@@ -145,7 +145,7 @@ class EnhancerLoadout(Base):
     __tablename__ = "EnhancerLoadout"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    enhancerTypeID: Mapped[int] = mapped_column(ForeignKey("EnhancerClass.id"))
+    enhancerClassID: Mapped[int] = mapped_column(ForeignKey("EnhancerClass.id"))
     amount: Mapped[int] = mapped_column(default=0)
 
 class Sockets(Base):
