@@ -47,3 +47,5 @@ keep in mind crit dmg +1% and +2% and ranger scope\
 relaodd speed from rings etc to show dps on stream overlay later\
 long term goals:\
 web based service if enough ned for it, including accounts etc.\
+
+py c:\Users\ndvds\Development\wxGlade-1.0.4\wxglade.py 

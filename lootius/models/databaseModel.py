@@ -3,6 +3,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
 """
 # default type mapping, deriving the type for mapped_column()
@@ -49,6 +50,8 @@ class Weapons(Base):
     ammoBurn: Mapped[int] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
+    type = relationship("WeaponTypes", backref="weapons")
+
 class Sights(Base):
     __tablename__ = "Sights"
 
@@ -73,6 +76,8 @@ class WeaponAmps(Base):
     decay: Mapped[float] = mapped_column(default=0)
     ammoBurn: Mapped[int] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
+
+    type = relationship("WeaponTypes", backref="amps")
 
 class WeaponAbsorbers(Base):
     __tablename__ = "WeaponAbsorbers"
@@ -140,6 +145,11 @@ class EnhancerClass(Base):
     enhancerTypeNameID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypeNames.id"))
     enhancerEffectID: Mapped[int] = mapped_column(ForeignKey("EnhancerEffects.id"), default=1)
     enhancerTypeID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypes.id"))
+
+    enhancerTypeName = relationship("EnhancerTypeNames", foreign_keys=[enhancerTypeNameID])
+
+    def getTypeName(self):
+        return f"{self.enhancerTypeName.name}"
 
 class EnhancerLoadout(Base):
     __tablename__ = "EnhancerLoadout"
