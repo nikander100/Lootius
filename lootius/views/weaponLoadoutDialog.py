@@ -505,7 +505,7 @@ class WeaponLoadoutDialog(wx.Dialog):
                 self.socket[name]["Amount"].GetValue()
             ])
         selectedLoadout = [selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers]
-        selectedEnhancers = [[8, 1], [9, 2], [8, 3], [8, 4], [9, 5], [9, 6], [9, 7], [9, 8], [8, 0], [8, 10]]
+        selectedEnhancers = [[8, 1], [9, 2], [8, 3], [8, 4], [9, 5], [9, 6], [9, 7], [9, 8], [8, 9], [8, 10]]
         # selectedLoadout = ['yee', 3, None, None, None, None, None, [[8, 1], [9, 2], [8, 3], [8, 4], [9, 5], [9, 6], [9, 7], [9, 8], [8, 9], [8, 10]]]
         self.dummySaveLoadout(selectedScope, selectedScopeSight, selectedEnhancers)
         print("\n\n\nI SAVED ",selectedLoadout)

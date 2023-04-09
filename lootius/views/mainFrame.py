@@ -50,6 +50,13 @@ class LootiusFrame(wx.Frame):
     def resetDb(event):
         from time import sleep
         from database import db
+        # from models.databaseModel import SocketLoadout
+
+        # e = db.DB.getSession()
+        # with e() as ses:
+        #     ses.query(SocketLoadout).filter(SocketLoadout.id == 1).delete()
+        #     ses.commit()
+        # return
         from os.path import realpath, join, dirname, abspath
         dbPath = realpath(join(dirname(abspath(__file__)), "../database/", "lootiusTest.db"))
 

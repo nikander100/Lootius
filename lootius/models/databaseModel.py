@@ -119,11 +119,15 @@ class EnhancerEffects(Base):
     decayAmount: Mapped[float] = mapped_column(default=0)
     bonusAmount: Mapped[float] = mapped_column(default=0)
 
+    enhancerClass3 = relationship("EnhancerClass", back_populates="enhancerEffect")
+
 class EnhancerNames(Base):
     __tablename__ = "EnhancerNames"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(TEXT)
+
+    enhancerClass1 = relationship("EnhancerClass", back_populates="enhancerName")
 
 class EnhancerTypeNames(Base):
     __tablename__ = "EnhancerTypeNames"
@@ -131,11 +135,15 @@ class EnhancerTypeNames(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(TEXT)
 
+    enhancerClass2 = relationship("EnhancerClass", back_populates="enhancerTypeName")
+
 class EnhancerTypes(Base):
     __tablename__ = "EnhancerTypes"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(TEXT)
+
+    enhancerClass4 = relationship("EnhancerClass", back_populates="enhancerType")
 
 class EnhancerClass(Base):
     __tablename__ = "EnhancerClass"
@@ -146,7 +154,12 @@ class EnhancerClass(Base):
     enhancerEffectID: Mapped[int] = mapped_column(ForeignKey("EnhancerEffects.id"), default=1)
     enhancerTypeID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypes.id"))
 
-    enhancerTypeName = relationship("EnhancerTypeNames", foreign_keys=[enhancerTypeNameID])
+    # enhancerTypeName = relationship("EnhancerTypeNames", foreign_keys=[enhancerTypeNameID])
+    enhancerName = relationship("EnhancerNames", back_populates="enhancerClass1")
+    enhancerTypeName = relationship("EnhancerTypeNames", back_populates="enhancerClass2")
+    enhancerEffect = relationship("EnhancerEffects", back_populates="enhancerClass3")
+    enhancerType = relationship("EnhancerTypes", back_populates="enhancerClass4")
+    enhancerLoadout = relationship("EnhancerLoadout", back_populates="enhancerClass")
 
     def getTypeName(self):
         return f"{self.enhancerTypeName.name}"
@@ -158,20 +171,40 @@ class EnhancerLoadout(Base):
     enhancerClassID: Mapped[int] = mapped_column(ForeignKey("EnhancerClass.id"))
     amount: Mapped[int] = mapped_column(default=0)
 
+    enhancerClass = relationship("EnhancerClass", back_populates="enhancerLoadout")
+
 class SocketLoadout(Base):
     __tablename__ = "SocketLoadout"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    enhancerOneID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerTwoID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerThreeID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerFourID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerFiveID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerSixID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerSevenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerEightID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerNineID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
-    enhancerTenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))
+    enhancerOneID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerTwoID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerThreeID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerFourID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerFiveID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerSixID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerSevenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerEightID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerNineID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+    enhancerTenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
+
+    enhancerOne = relationship("EnhancerLoadout", foreign_keys=[enhancerOneID], backref="socketLoadoutOne", cascade="all, delete")
+    enhancerTwo = relationship("EnhancerLoadout", foreign_keys=[enhancerTwoID], backref="socketLoadoutTwo", cascade="all, delete")
+    enhancerThree = relationship("EnhancerLoadout", foreign_keys=[enhancerThreeID], backref="socketLoadoutThree", cascade="all, delete")
+    enhancerFour = relationship("EnhancerLoadout", foreign_keys=[enhancerFourID], backref="socketLoadoutFour", cascade="all, delete")
+    enhancerFive = relationship("EnhancerLoadout", foreign_keys=[enhancerFiveID], backref="socketLoadoutFive", cascade="all, delete")
+    enhancerSix = relationship("EnhancerLoadout", foreign_keys=[enhancerSixID], backref="socketLoadoutSix", cascade="all, delete")
+    enhancerSeven = relationship("EnhancerLoadout", foreign_keys=[enhancerSevenID], backref="socketLoadoutSeven", cascade="all, delete")
+    enhancerEight = relationship("EnhancerLoadout", foreign_keys=[enhancerEightID], backref="socketLoadoutEight", cascade="all, delete")
+    enhancerNine = relationship("EnhancerLoadout", foreign_keys=[enhancerNineID], backref="socketLoadoutNine", cascade="all, delete")
+    enhancerTen = relationship("EnhancerLoadout", foreign_keys=[enhancerTenID], backref="socketLoadoutTen", cascade="all, delete")
+
+    @property
+    def enhancers(self):
+        return [self.enhancerOne, self.enhancerTwo, self.enhancerThree,
+                self.enhancerFour, self.enhancerFive, self.enhancerSix,
+                self.enhancerSeven, self.enhancerEight, self.enhancerNine,
+                self.enhancerTen]
 
     """
     Combat moddule tables
