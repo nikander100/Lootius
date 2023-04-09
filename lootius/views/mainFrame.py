@@ -61,10 +61,10 @@ class LootiusFrame(wx.Frame):
         dbPath = realpath(join(dirname(abspath(__file__)), "../database/", "lootiusTest.db"))
 
         db.DB.dropAll()
-        print("\n\n\nResetted DATABASE\n\n\n")
+        print("\n\n\nDeleted DATABASE\n\n\n")
         sleep(3)
         db.Setup.run(dbPath)
-        print("\n\n\nMade DATABASE\n\n\n")
+        print("\n\n\nRemade DATABASE\n\n\n")
     #end tmp
 
     def ExitApp(self, event):

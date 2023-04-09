@@ -398,8 +398,11 @@ class WeaponLoadoutDialog(wx.Dialog):
                 self.scopeSightInputBox.Disable()
                 self.sightInputBox.Disable()
                 self.__disableEnhancers()
+                self.buttonSave.Disable()
                 
             else:
+                if not self.weaponLoadoutNameInput.IsEmpty():
+                    self.buttonSave.Enable()
                 with Session() as session:
                     selectedWeapon = session.query(Weapons).filter_by(id=selectedWeaponID).first()
                     print(f"\n\n\n{selectedWeapon.name}\n\n\n") #debug
@@ -484,7 +487,7 @@ class WeaponLoadoutDialog(wx.Dialog):
         """Enable the save button if the weapon loadout name is not empty."""
         # TODO check if name not in use by other loadout (or overwrite exustugn loadout if known?)
         setName = event.GetEventObject()
-        if not setName.IsEmpty():
+        if not setName.IsEmpty() and self.weaponInputBox.GetSelection() != -1 and self.weaponInputBox.GetClientData(self.weaponInputBox.GetSelection()):
             self.buttonSave.Enable()
         else:
             self.buttonSave.Disable()
@@ -505,35 +508,64 @@ class WeaponLoadoutDialog(wx.Dialog):
                 self.socket[name]["Amount"].GetValue()
             ])
         selectedLoadout = [selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers]
-        selectedEnhancers = [[8, 1], [9, 2], [8, 3], [8, 4], [9, 5], [9, 6], [9, 7], [9, 8], [8, 9], [8, 10]]
-        # selectedLoadout = ['yee', 3, None, None, None, None, None, [[8, 1], [9, 2], [8, 3], [8, 4], [9, 5], [9, 6], [9, 7], [9, 8], [8, 9], [8, 10]]]
-        self.dummySaveLoadout(selectedScope, selectedScopeSight, selectedEnhancers)
+        self.dummySaveLoadout(selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers)
         print("\n\n\nI SAVED ",selectedLoadout)
         self.EndModal(0)
     
     """go in business layer"""
-    def dummySaveLoadout(self, selectedScope, selectedScopeSight, selectedEnhancers):
+    def dummySaveLoadout(self, selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers):
         with Session() as session:
-            subLoadouts = []
-            for enhancer in selectedEnhancers:
-                if enhancer[0] is not None and enhancer[1] != 0:
-                    subLoadouts.append(
-                        EnhancerLoadout(
-                            enhancerClassID=enhancer[0],
-                            amount=enhancer[1]
-                        )
-                    )
-            subLoadouts.append(
-                ScopeLoadout(
-                    scopeID=selectedScope,
-                    sightID=selectedScopeSight
-                )
-            )
-            session.add_all(subLoadouts)
-            session.flush()
-            """ 
-            TODO adddddd rest of loadout to add, go over db to setup nullable for certain things. then casdcade thenorm relations()
-            """
 
+            enhancerTempIDs = [None] * 10
+            for i, enhancer in enumerate(selectedEnhancers):
+                if enhancer[0] is not None and enhancer[1] != 0:
+                    enhancerLoadout = EnhancerLoadout(
+                        enhancerClassID=enhancer[0],
+                        amount=enhancer[1]
+                    )
+                    session.add(enhancerLoadout)
+                    session.flush()
+                    enhancerTempIDs[i] = enhancerLoadout.id
+
+            scopeLoadout = None
+            if selectedScope is not None:
+                scopeLoadout = ScopeLoadout(
+                        scopeID=selectedScope,
+                        sightID=selectedScopeSight
+                )
+                session.add(scopeLoadout)
+                session.flush()
+            
+            socketLoadout = None
+            if not all(enhancer == [None, 0] for enhancer in selectedEnhancers):
+                socketLoadout = SocketLoadout(
+                    enhancerOneID=enhancerTempIDs[0],
+                    enhancerTwoID=enhancerTempIDs[1],
+                    enhancerThreeID=enhancerTempIDs[2],
+                    enhancerFourID=enhancerTempIDs[3],
+                    enhancerFiveID=enhancerTempIDs[4],
+                    enhancerSixID=enhancerTempIDs[5],
+                    enhancerSevenID=enhancerTempIDs[6],
+                    enhancerEightID=enhancerTempIDs[7],
+                    enhancerNineID=enhancerTempIDs[8],
+                    enhancerTenID=enhancerTempIDs[9]
+                )
+                session.add(socketLoadout)
+                session.flush()
+
+            weaponLoadout = WeaponLoadout(
+                name=selectedName,
+                weaponID=selectedWeapon,
+                socketLoadoutID=socketLoadout.id if socketLoadout is not None else None,
+                WeaponAmpID=selectedAmp,
+                scopeLoadoutID=scopeLoadout.id if scopeLoadout is not None else None,
+                sightID=selectedSight,
+                absorberID=selectedAbs
+            )
+            session.add(weaponLoadout)
+            
+            """ 
+            TODO add rest of loadout to add, go over db to setup  then casdcade andd orm relations()
+            """
             session.commit()
 

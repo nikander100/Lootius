@@ -102,11 +102,11 @@ class WeaponLoadout(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(TEXT,unique=True)
     weaponID: Mapped[int] = mapped_column(ForeignKey("Weapons.id"))
-    socketLoadoutID: Mapped[int] = mapped_column(ForeignKey("SocketLoadout.id"))
-    WeaponAmpID: Mapped[int] = mapped_column(ForeignKey("WeaponAmps.id"))
-    scopeLoadoutID: Mapped[int] = mapped_column(ForeignKey("ScopeLoadout.id"))
-    sightID: Mapped[int] = mapped_column(ForeignKey("Sights.id"))
-    absorberID: Mapped[int] = mapped_column(ForeignKey("WeaponAbsorbers.id"))
+    socketLoadoutID: Mapped[int] = mapped_column(ForeignKey("SocketLoadout.id"), nullable=True)
+    WeaponAmpID: Mapped[int] = mapped_column(ForeignKey("WeaponAmps.id"), nullable=True)
+    scopeLoadoutID: Mapped[int] = mapped_column(ForeignKey("ScopeLoadout.id"), nullable=True)
+    sightID: Mapped[int] = mapped_column(ForeignKey("Sights.id"), nullable=True)
+    absorberID: Mapped[int] = mapped_column(ForeignKey("WeaponAbsorbers.id"), nullable=True)
 
 """
 Enhancer tables
