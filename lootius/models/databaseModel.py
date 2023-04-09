@@ -94,7 +94,7 @@ class ScopeLoadout(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     scopeID: Mapped[int] = mapped_column(ForeignKey("Scopes.id"))
-    sightID: Mapped[int] = mapped_column(ForeignKey("Sights.id"))
+    sightID: Mapped[int] = mapped_column(ForeignKey("Sights.id"), nullable=True)
 
 class WeaponLoadout(Base):
     __tablename__ = "WeaponLoadout"
@@ -102,7 +102,7 @@ class WeaponLoadout(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(TEXT,unique=True)
     weaponID: Mapped[int] = mapped_column(ForeignKey("Weapons.id"))
-    socketsID: Mapped[int] = mapped_column(ForeignKey("Sockets.id"))
+    socketLoadoutID: Mapped[int] = mapped_column(ForeignKey("SocketLoadout.id"))
     WeaponAmpID: Mapped[int] = mapped_column(ForeignKey("WeaponAmps.id"))
     scopeLoadoutID: Mapped[int] = mapped_column(ForeignKey("ScopeLoadout.id"))
     sightID: Mapped[int] = mapped_column(ForeignKey("Sights.id"))
@@ -158,8 +158,8 @@ class EnhancerLoadout(Base):
     enhancerClassID: Mapped[int] = mapped_column(ForeignKey("EnhancerClass.id"))
     amount: Mapped[int] = mapped_column(default=0)
 
-class Sockets(Base):
-    __tablename__ = "Sockets"
+class SocketLoadout(Base):
+    __tablename__ = "SocketLoadout"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     enhancerOneID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"))

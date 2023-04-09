@@ -14,6 +14,9 @@ class DB:
     #Returns new session
     @classmethod
     def getSession(self):
+        """Returns new Session.
+        For the given session can also start: with Session. and include begin()/commit()/rollback()
+        then dont have to commit, etc. manually"""
         return (sessionmaker(self.engine))
     
     @classmethod

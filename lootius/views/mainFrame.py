@@ -18,12 +18,24 @@ class LootiusFrame(wx.Frame):
         self.title = title
         super().__init__(None, wx.ID_ANY, self.title)
         self.Size = size
+        self.SetBackgroundColour(wx.Colour(30,30,30))
 
         # Modules
         self.chatLogParser = ChatLogParser(self)
 
         # create a panel in the frame
         # pnl = wx.Panel(self);
+        # pnl.SetBackgroundColour(wx.Colour(30,30,30))
+
+        #tmp
+        mains = wx.BoxSizer(wx.HORIZONTAL)
+        buttonReset = wx.Button(self, wx.NewId(), "Reset Database")
+        mains.Add(buttonReset, wx.SizerFlags().Border(wx.TOP|wx.LEFT, 25))
+
+        self.SetSizer(mains)
+        self.Bind(wx.EVT_BUTTON, self.resetDb, id=buttonReset.GetId())
+        #end tmp
+
 
         # Add menubar
         self.SetMenuBar(mainMenuBar(self))
@@ -33,6 +45,21 @@ class LootiusFrame(wx.Frame):
         self.CreateStatusBar();
         self.SetStatusText("Welcome to Lootius, may I be with you!"); ##show latest hof/global in statusbar option?
 
+    #tmp
+    @staticmethod
+    def resetDb(event):
+        from time import sleep
+        from database import db
+        from os.path import realpath, join, dirname, abspath
+        dbPath = realpath(join(dirname(abspath(__file__)), "../database/", "lootiusTest.db"))
+
+        db.DB.dropAll()
+        print("\n\n\nResetted DATABASE\n\n\n")
+        sleep(3)
+        db.Setup.run(dbPath)
+        print("\n\n\nMade DATABASE\n\n\n")
+    #end tmp
+
     def ExitApp(self, event):
         self.Close()
         event.Skip()
@@ -41,7 +68,8 @@ class LootiusFrame(wx.Frame):
         info = wx.adv.AboutDialogInfo()
         info.Name = "Lootius"
         info.Version = "0.0.0"
-        info.Description = "This is Lootius, a loot tracker and toolbox for Entropia Universe.\nThis application is developed by Nikander and k-Max, but is opensource, feel free to contribute to it!"
+        info.Description = """This is Lootius, a loot tracker and toolbox for Entropia Universe.\n 
+                            This application is developed by Nikander and k-Max, but is opensource, feel free to contribute to it!"""
         info.AddDeveloper("Nikander")
         info.AddDeveloper("K-Max")
         wx.adv.AboutBox(info)
@@ -54,8 +82,10 @@ class LootiusFrame(wx.Frame):
         with WeaponLoadoutDialog(self) as dlg:
             dlg.ShowModal()
 
+    
+
     @staticmethod
-    def goWiki(event):
+    def goWiki():
         webbrowser.open("https://github.com/nikander100/Lootius/tree/dev")
     
     def registerMenu(self):

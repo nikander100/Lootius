@@ -161,6 +161,7 @@ cython_debug/
 
 # VsCode
 .code-workspace
+.vscode/
 
 # DbSchema
 data/*.dbs
