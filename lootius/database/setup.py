@@ -13,9 +13,9 @@ class Setup:
         from lootius.models.databaseModel import EnhancerTypes
         with Session.begin() as session:
             typeOne, typeTwo, typeThree = (EnhancerTypes() for _ in range(3))
-            typeTwo.type = "healing"
-            typeThree.type = "mining"
-            typeOne.type = "weapon"
+            typeOne.type = "healing"
+            typeTwo.type = "mining"
+            typeThree.type = "weapons"
             session.add_all([typeOne, typeTwo, typeThree])
 
     def __populateEnhancerNameTable(self):
