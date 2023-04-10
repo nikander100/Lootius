@@ -536,27 +536,23 @@ class WeaponLoadoutDialog(wx.Dialog):
                 session.add(scopeLoadout)
                 session.flush()
             
-            socketLoadout = None
-            if not all(enhancer == [None, 0] for enhancer in selectedEnhancers):
-                socketLoadout = SocketLoadout(
-                    enhancerOneID=enhancerTempIDs[0],
-                    enhancerTwoID=enhancerTempIDs[1],
-                    enhancerThreeID=enhancerTempIDs[2],
-                    enhancerFourID=enhancerTempIDs[3],
-                    enhancerFiveID=enhancerTempIDs[4],
-                    enhancerSixID=enhancerTempIDs[5],
-                    enhancerSevenID=enhancerTempIDs[6],
-                    enhancerEightID=enhancerTempIDs[7],
-                    enhancerNineID=enhancerTempIDs[8],
-                    enhancerTenID=enhancerTempIDs[9]
-                )
-                session.add(socketLoadout)
-                session.flush()
+            socketLoadout = SocketLoadout(
+                enhancerOneID=enhancerTempIDs[0],
+                enhancerTwoID=enhancerTempIDs[1],
+                enhancerThreeID=enhancerTempIDs[2],
+                enhancerFourID=enhancerTempIDs[3],
+                enhancerFiveID=enhancerTempIDs[4],
+                enhancerSixID=enhancerTempIDs[5],
+                enhancerSevenID=enhancerTempIDs[6],
+                enhancerEightID=enhancerTempIDs[7],
+                enhancerNineID=enhancerTempIDs[8],
+                enhancerTenID=enhancerTempIDs[9]
+            )
 
             weaponLoadout = WeaponLoadout(
                 name=selectedName,
                 weaponID=selectedWeapon,
-                socketLoadoutID=socketLoadout.id if socketLoadout is not None else None,
+                socketLoadout=socketLoadout,
                 WeaponAmpID=selectedAmp,
                 scopeLoadoutID=scopeLoadout.id if scopeLoadout is not None else None,
                 sightID=selectedSight,
