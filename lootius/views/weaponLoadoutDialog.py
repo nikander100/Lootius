@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 import wx
-import time
-
 from modules import loadoutManager
 
-"""
-TODO add data intereaction to business layer instead of straight into gui? still have to figure out how to do that though, also setup cascading for database, loadouts primerly.
-"""
 class WeaponLoadoutDialog(wx.Dialog):
     """
     A dialog for creating a new weapon loadout.
@@ -60,6 +55,8 @@ class WeaponLoadoutDialog(wx.Dialog):
         Event handler for when a scope is selected in the scope combo box.
     onNameSet(self, event):
         Enable the save button if the weapon loadout name is not empty.
+    onSave(self, event):
+        Event handler for when the "Save" button is clicked. Saves the selected loadout values to the loadout manager.
     
     """
     def __init__(self, parent):
@@ -144,7 +141,7 @@ class WeaponLoadoutDialog(wx.Dialog):
         self.socketLoadoutSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Enahncers:"), wx.HORIZONTAL)
         socketLoadout.Add(self.socketLoadoutSizer, 1, wx.EXPAND, 0)
 
-        enhancers = loadoutManager.getEnhancers()
+        enhancers = loadoutManager.getEnhancers(3)
 
         self.socket = {}
         socketNames = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']
@@ -261,20 +258,18 @@ class WeaponLoadoutDialog(wx.Dialog):
         for name in self.socket:
             self.socket[name]["Item"].Bind(wx.EVT_COMBOBOX, lambda event, name=name: self.onEnhancerSelect(event, self.socket[name]["Amount"]))
 
-    def __widgetMaker(self, widget, querys):
+    #possibly be added to modules later, if used in other files to!
+    def __widgetMaker(self, widget, data):
         """
-        Clear and populate a wxPython widget with query names or types.
+        Clear and populate a wxPython widget with query names and associated IDs.
 
         Parameters
         ----------
         widget : wxPython widget
             The widget to be cleared and populated.
-        querys : list of query objects
-            The query objects to be used to populate the widget.
-        isEnhancer : bool, optional
-            A flag indicating whether the query objects should be treated as
-            "enhancers" and their type names should be used instead of their names.
-            Default is False.
+        data : tuple of lists
+            A tuple of two lists, where the first list contains the names of the data and the second
+            list contains the IDs of the corresponding data.
 
         Returns
         -------
@@ -285,25 +280,18 @@ class WeaponLoadoutDialog(wx.Dialog):
         The `widget` is first cleared using its `Clear()` method, and then an empty
         string is appended to it using `widget.Append("")`.
 
-        If `isEnhancer` is False, the function creates a list of query names by
-        calling the `name` attribute of each query object in the `querys` list
-        using the `map()` and `lambda` functions. If `isEnhancer` is True, the
-        function creates a list of query type names by calling the `getTypeName()`
-        method of each query object.
+        The function creates a list of data names by extracting the first list of the `data` tuple.
+        It then appends the list of names to the `widget` using `widget.Append(name)`.
 
-        The function then appends the list of names or type names to the `widget`
-        using `widget.Append(value)`.
-
-        Finally, the function iterates over the `querys` list using `enumerate()`
-        to get both the index and the object, and calls
-        `widget.SetClientData(_ + 1, obj.id)` for each object in the list. This sets
-        the client data associated with the item in the `widget` to the `id`
-        attribute of the corresponding `query` object, plus 1.
+        Finally, the function iterates over the IDs of the data using `enumerate()`
+        to get both the index and the ID, and calls
+        `widget.SetClientData(_ + 1, id)` for each ID in the list. This sets
+        the client data associated with the item in the `widget` to the corresponding ID, plus 1.
         """
         widget.Clear()
         widget.Append("")
-        widget.Append(querys[0])
-        for i, id in enumerate(querys[1]):
+        widget.Append(data[0])
+        for i, id in enumerate(data[1]):
             widget.SetClientData(i + 1, id)
 
     def __enableEnhancers(self):
@@ -311,10 +299,6 @@ class WeaponLoadoutDialog(wx.Dialog):
         Enables all socket enhancers.
 
         This method loops through all the socket components and enables the 'Item' field of each enhancer.
-
-        Returns
-        -------
-        None
         """
         for _, enhancer in self.socket.items():
             enhancer["Item"].Enable()
@@ -325,10 +309,6 @@ class WeaponLoadoutDialog(wx.Dialog):
 
         The method iterates through each socket in the `socket` dictionary and disables
         both the `"Item"` and `"Amount"` components for the socket.
-
-        Returns
-        -------
-        None
         """
         for _, enhancer in self.socket.items():
             enhancer["Item"].Disable()
@@ -340,10 +320,6 @@ class WeaponLoadoutDialog(wx.Dialog):
     
         For each socket, set the enhancer item selection to -1 (unselected)
         and set the enhancer amount to its minimum value.
-    
-        Raises
-        ------
-        None
         """
         for _, enhancer in self.socket.items():
             enhancer["Item"].SetSelection(-1)
@@ -472,7 +448,29 @@ class WeaponLoadoutDialog(wx.Dialog):
             self.scopeSightInputBox.Enable()
 
     def onNameSet(self, event):
-        """Enable the save button if the weapon loadout name is not empty."""
+        """
+        Enable the save button if the weapon loadout name is not empty and a weapon has been selected.
+
+        vbnet
+
+        Parameters
+        ----------
+        event : wxPython event object
+            The event object.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function is called when the user enters a weapon loadout name in the name input box.
+        If the name input box is not empty and a weapon has been selected, the save button is enabled.
+        Otherwise, the save button is disabled.
+
+        If the save button is enabled, the user can click on it to save the weapon loadout with the
+        entered name and selected weapon.
+        """
         # TODO check if name not in use by other loadout (or overwrite exustugn loadout if known?)
         setName = event.GetEventObject()
         if not setName.IsEmpty() and self.weaponInputBox.GetSelection() != -1 and self.weaponInputBox.GetClientData(self.weaponInputBox.GetSelection()):
@@ -480,10 +478,27 @@ class WeaponLoadoutDialog(wx.Dialog):
         else:
             self.buttonSave.Disable()
 
-    # Dummy Save
     def onSave(self, event):
+        """
+        Save the current loadout with the selected equipment.
+
+        Parameters
+        ----------
+        event : wx.Event
+            The event that triggered the function call.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function retrieves the values of the currently selected equipment for the loadout and passes them to the
+        loadout manager to save them. Finally, it ends the modal dialog.
+
+        """
         selectedName = self.weaponLoadoutNameInput.GetValue()
-        selectedWeapon = self.weaponInputBox.GetClientData(self.weaponInputBox.GetSelection()) if self.weaponInputBox.GetSelection() != -1 else None
+        selectedWeapon = self.weaponInputBox.GetClientData(self.weaponInputBox.GetSelection())
         selectedAmp = self.ampInputBox.GetClientData(self.ampInputBox.GetSelection()) if self.ampInputBox.GetSelection() != -1 else None
         selectedAbs = self.absInputBox.GetClientData(self.absInputBox.GetSelection()) if self.absInputBox.GetSelection() != -1 else None
         selectedScope = self.scopeInputBox.GetClientData(self.scopeInputBox.GetSelection()) if self.scopeInputBox.GetSelection() != -1 else None

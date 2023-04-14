@@ -51,7 +51,7 @@ class Weapons(Base):
     ammoBurn: Mapped[int] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
-    type = relationship("WeaponTypes", backref="weapons")
+    type: Mapped["WeaponTypes"] = relationship(backref="weapons")
 
 class Sights(Base):
     __tablename__ = "Sights"
@@ -61,6 +61,8 @@ class Sights(Base):
     decay: Mapped[float] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
+    type: Mapped["WeaponTypes"] = relationship(backref="sights")
+
 class Scopes(Base):
     __tablename__ = "Scopes"
 
@@ -68,6 +70,8 @@ class Scopes(Base):
     name: Mapped[str] =  mapped_column(TEXT)
     decay: Mapped[float] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
+
+    type: Mapped["WeaponTypes"] = relationship(backref="scopes")
 
 class WeaponAmps(Base):
     __tablename__ = "WeaponAmps"
@@ -78,7 +82,7 @@ class WeaponAmps(Base):
     ammoBurn: Mapped[int] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
-    type = relationship("WeaponTypes", backref="amps")
+    type: Mapped["WeaponTypes"] = relationship(backref="amps")
 
 class WeaponAbsorbers(Base):
     __tablename__ = "WeaponAbsorbers"
@@ -88,6 +92,8 @@ class WeaponAbsorbers(Base):
     decay: Mapped[float] = mapped_column(default=0)
     absorbPercent: Mapped[float] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
+
+    type: Mapped["WeaponTypes"] = relationship(backref="absorbers")
 
 # Loadout
 class ScopeLoadout(Base):
@@ -107,10 +113,22 @@ class WeaponLoadout(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(TEXT,unique=True)
     weaponID: Mapped[int] = mapped_column(ForeignKey("Weapons.id"))
-    WeaponAmpID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponAmps.id"), nullable=True)
+    amplifierID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponAmps.id"), nullable=True)
     sightID: Mapped[Optional[int]] = mapped_column(ForeignKey("Sights.id"), nullable=True)
     absorberID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponAbsorbers.id"), nullable=True)
 
+    weapon: Mapped["Weapons"] = relationship(
+        foreign_keys=[weaponID])
+    
+    amplifier: Mapped[Optional["WeaponAmps"]] = relationship(
+        foreign_keys=[amplifierID])
+    
+    absorber: Mapped[Optional["WeaponAbsorbers"]] = relationship(
+        foreign_keys=[absorberID])
+    
+    sight: Mapped[Optional["Sights"]] = relationship(
+        foreign_keys=[sightID])
+    
     enhancerLoadout: Mapped[Optional[List["EnhancerLoadout"]]] = relationship(
         back_populates="bp_weaponLoadout",
         cascade="all, delete, delete-orphan",
@@ -165,7 +183,8 @@ class EnhancerClass(Base):
     enhancerEffectID: Mapped[int] = mapped_column(ForeignKey("EnhancerEffects.id"), default=1)
     enhancerTypeID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypes.id"))
 
-    enhancerTypeName = relationship("EnhancerTypeNames", foreign_keys=[enhancerTypeNameID])
+    type: Mapped["EnhancerTypeNames"] = relationship(foreign_keys=[enhancerTypeNameID])
+    effect: Mapped["EnhancerEffects"] = relationship(foreign_keys=[enhancerEffectID])
 
 class EnhancerLoadout(Base):
     __tablename__ = "EnhancerLoadout"
@@ -176,6 +195,7 @@ class EnhancerLoadout(Base):
     enhancerClassID: Mapped[int] = mapped_column(ForeignKey("EnhancerClass.id"))
     amount: Mapped[int] = mapped_column(default=0)
 
+    enhancer: Mapped["EnhancerClass"] = relationship(foreign_keys=[enhancerClassID])
     bp_weaponLoadout: Mapped["WeaponLoadout"] = relationship(
         back_populates="enhancerLoadout",
     )
