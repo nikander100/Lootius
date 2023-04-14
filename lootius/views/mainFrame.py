@@ -55,6 +55,8 @@ class LootiusFrame(wx.Frame):
         e = db.DB.getSession()
         with e() as ses:
             lol = ses.query(WeaponLoadout).filter(WeaponLoadout.name == "test").first()
+            for enahncer in lol.enhancerLoadout:
+                print (enahncer.enhancerClassID, enahncer.socket)
             ses.delete(lol)
             ses.commit()
         return

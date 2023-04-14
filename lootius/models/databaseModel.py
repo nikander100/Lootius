@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from typing import Optional
+from typing import Optional, List
 
 """
 # default type mapping, deriving the type for mapped_column()
@@ -93,9 +93,13 @@ class WeaponAbsorbers(Base):
 class ScopeLoadout(Base):
     __tablename__ = "ScopeLoadout"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    weaponLoadoutID: Mapped[int] = mapped_column(ForeignKey("WeaponLoadout.id"), primary_key=True)
     scopeID: Mapped[int] = mapped_column(ForeignKey("Scopes.id"))
-    sightID: Mapped[int] = mapped_column(ForeignKey("Sights.id"), nullable=True)
+    sightID: Mapped[Optional[int]] = mapped_column(ForeignKey("Sights.id"), nullable=True)
+
+    bp_weaponLoadout: Mapped["WeaponLoadout"] = relationship(
+        back_populates="scopeLoadout",
+    )
 
 class WeaponLoadout(Base):
     __tablename__ = "WeaponLoadout"
@@ -103,16 +107,21 @@ class WeaponLoadout(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(TEXT,unique=True)
     weaponID: Mapped[int] = mapped_column(ForeignKey("Weapons.id"))
-    socketLoadoutID: Mapped[int] = mapped_column(ForeignKey("SocketLoadout.id"), nullable=True)
-    socketLoadout: Mapped[Optional["SocketLoadout"]] = relationship(
+    WeaponAmpID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponAmps.id"), nullable=True)
+    sightID: Mapped[Optional[int]] = mapped_column(ForeignKey("Sights.id"), nullable=True)
+    absorberID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponAbsorbers.id"), nullable=True)
+
+    enhancerLoadout: Mapped[Optional[List["EnhancerLoadout"]]] = relationship(
         back_populates="bp_weaponLoadout",
         cascade="all, delete, delete-orphan",
         single_parent=True
     )
-    WeaponAmpID: Mapped[int] = mapped_column(ForeignKey("WeaponAmps.id"), nullable=True)
-    scopeLoadoutID: Mapped[int] = mapped_column(ForeignKey("ScopeLoadout.id"), nullable=True)
-    sightID: Mapped[int] = mapped_column(ForeignKey("Sights.id"), nullable=True)
-    absorberID: Mapped[int] = mapped_column(ForeignKey("WeaponAbsorbers.id"), nullable=True)
+
+    scopeLoadout: Mapped[Optional["ScopeLoadout"]] = relationship(
+        back_populates="bp_weaponLoadout",
+        cascade="all, delete, delete-orphan",
+        single_parent=True
+    )
 
 """
 Enhancer tables
@@ -158,55 +167,19 @@ class EnhancerClass(Base):
 
     enhancerTypeName = relationship("EnhancerTypeNames", foreign_keys=[enhancerTypeNameID])
 
-    def getTypeName(self):
-        return f"{self.enhancerTypeName.name}"
-
 class EnhancerLoadout(Base):
     __tablename__ = "EnhancerLoadout"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    weaponLoadoutID: Mapped[int] = mapped_column(ForeignKey("WeaponLoadout.id"))
+    socket: Mapped[int] = mapped_column()
     enhancerClassID: Mapped[int] = mapped_column(ForeignKey("EnhancerClass.id"))
     amount: Mapped[int] = mapped_column(default=0)
 
-    # enhancerClass = relationship("EnhancerClass", back_populates="enhancerLoadout")
-
-class SocketLoadout(Base):
-    __tablename__ = "SocketLoadout"
-    
-    id: Mapped[int] = mapped_column(primary_key=True)
     bp_weaponLoadout: Mapped["WeaponLoadout"] = relationship(
-        back_populates="socketLoadout",
+        back_populates="enhancerLoadout",
     )
-    enhancerOneID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerTwoID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerThreeID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerFourID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerFiveID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerSixID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerSevenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerEightID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerNineID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-    enhancerTenID: Mapped[int] = mapped_column(ForeignKey("EnhancerLoadout.id"), nullable=True)
-
-    # enhancerOne = relationship("EnhancerLoadout", foreign_keys=[enhancerOneID], backref="socketLoadoutOne", cascade="all, delete")
-    # enhancerTwo = relationship("EnhancerLoadout", foreign_keys=[enhancerTwoID], backref="socketLoadoutTwo", cascade="all, delete")
-    # enhancerThree = relationship("EnhancerLoadout", foreign_keys=[enhancerThreeID], backref="socketLoadoutThree", cascade="all, delete")
-    # enhancerFour = relationship("EnhancerLoadout", foreign_keys=[enhancerFourID], backref="socketLoadoutFour", cascade="all, delete")
-    # enhancerFive = relationship("EnhancerLoadout", foreign_keys=[enhancerFiveID], backref="socketLoadoutFive", cascade="all, delete")
-    # enhancerSix = relationship("EnhancerLoadout", foreign_keys=[enhancerSixID], backref="socketLoadoutSix", cascade="all, delete")
-    # enhancerSeven = relationship("EnhancerLoadout", foreign_keys=[enhancerSevenID], backref="socketLoadoutSeven", cascade="all, delete")
-    # enhancerEight = relationship("EnhancerLoadout", foreign_keys=[enhancerEightID], backref="socketLoadoutEight", cascade="all, delete")
-    # enhancerNine = relationship("EnhancerLoadout", foreign_keys=[enhancerNineID], backref="socketLoadoutNine", cascade="all, delete")
-    # enhancerTen = relationship("EnhancerLoadout", foreign_keys=[enhancerTenID], backref="socketLoadoutTen", cascade="all, delete")
-
-    # @property
-    # def enhancers(self):
-    #     return [self.enhancerOne, self.enhancerTwo, self.enhancerThree,
-    #             self.enhancerFour, self.enhancerFive, self.enhancerSix,
-    #             self.enhancerSeven, self.enhancerEight, self.enhancerNine,
-    #             self.enhancerTen]
 
     """
     Combat moddule tables
     """
-    

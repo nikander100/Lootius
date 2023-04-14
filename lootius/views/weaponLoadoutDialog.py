@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 import wx
-import sqlalchemy 
 import time
 
-from database import db
-from models.databaseModel import Weapons, Sights, Scopes, EnhancerClass, WeaponAbsorbers, WeaponLoadout, ScopeLoadout, EnhancerLoadout, SocketLoadout
-Session = db.DB.getSession()
+from modules import loadoutManager
 
 """
 TODO add data intereaction to business layer instead of straight into gui? still have to figure out how to do that though, also setup cascading for database, loadouts primerly.
@@ -85,12 +82,11 @@ class WeaponLoadoutDialog(wx.Dialog):
         weaponLoadoutName.Add(self.weaponLoadoutNameInput, 5, wx.EXPAND|wx.LEFT|wx.RIGHT, 5)
 
         weaponInput = wx.BoxSizer(wx.HORIZONTAL)
-        with Session() as session:
-            weaponQuery = session.query(Weapons).all()
+        weapons = loadoutManager.getWeapons()
 
         weaponInputName = wx.StaticText(self, wx.ID_ANY, "Weapon:", style=wx.ALIGN_LEFT)
         self.weaponInputBox = wx.ComboBox(self, wx.ID_ANY, value="Select..", choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
-        self.__widgetMaker(self.weaponInputBox, weaponQuery)
+        self.__widgetMaker(self.weaponInputBox, weapons)
         weaponInput.Add(weaponInputName, 1, wx.ALIGN_CENTER_VERTICAL|wx.FIXED_MINSIZE|wx.LEFT|wx.RIGHT, 5)
         weaponInput.Add(self.weaponInputBox, 5, wx.EXPAND|wx.LEFT|wx.RIGHT, 5)
 
@@ -102,9 +98,8 @@ class WeaponLoadoutDialog(wx.Dialog):
         self.ampInputBox.Disable()
 
         absInput = wx.BoxSizer(wx.HORIZONTAL)
-        with Session() as session:
-            self.absQuery = session.query(WeaponAbsorbers).filter(WeaponAbsorbers.weaponTypeID == 1)
-            self.absMeleeQuery = session.query(WeaponAbsorbers)
+        self.absorbers = loadoutManager.getAbsorbers(weaponType=1)
+        self.meleeobsorbers = loadoutManager.getAbsorbers()
         
         absInputName = wx.StaticText(self, wx.ID_ANY, "Absorber:", style=wx.ALIGN_LEFT)
         self.absInputBox = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
@@ -115,23 +110,21 @@ class WeaponLoadoutDialog(wx.Dialog):
         scopeLoadout = wx.BoxSizer(wx.VERTICAL)
 
         scopeInput = wx.BoxSizer(wx.HORIZONTAL)
-        with Session() as session:
-            scopeQuery = session.query(Scopes)
+        scopes = loadoutManager.getScopes()
 
         scopeInputName = wx.StaticText(self, wx.ID_ANY, "Scope:", style=wx.ALIGN_LEFT)
         self.scopeInputBox = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
-        self.__widgetMaker(self.scopeInputBox, scopeQuery)
+        self.__widgetMaker(self.scopeInputBox, scopes)
         scopeInput.Add(scopeInputName, 1, wx.ALIGN_CENTER_VERTICAL|wx.FIXED_MINSIZE|wx.LEFT|wx.RIGHT, 5)
         scopeInput.Add(self.scopeInputBox, 5, wx.EXPAND|wx.LEFT|wx.RIGHT, 5)
         self.scopeInputBox.Disable()
 
         scopeSightInput = wx.BoxSizer(wx.HORIZONTAL)
-        with Session() as session:
-            sightQuery = session.query(Sights)
+        sights = loadoutManager.getSights()
 
         scopeSightInputName = wx.StaticText(self, wx.ID_ANY, "Sight:", style=wx.ALIGN_LEFT)
         self.scopeSightInputBox = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
-        self.__widgetMaker(self.scopeSightInputBox, sightQuery)
+        self.__widgetMaker(self.scopeSightInputBox, sights)
         scopeSightInput.Add(scopeSightInputName, 1, wx.ALIGN_CENTER_VERTICAL|wx.FIXED_MINSIZE|wx.LEFT, 10)
         scopeSightInput.Add(self.scopeSightInputBox, 5, wx.EXPAND|wx.LEFT|wx.RIGHT, 5)
         self.scopeSightInputBox.Disable()
@@ -142,7 +135,7 @@ class WeaponLoadoutDialog(wx.Dialog):
         sightInput = wx.BoxSizer(wx.HORIZONTAL)
         sightInputName = wx.StaticText(self, wx.ID_ANY, "Sight:", style=wx.ALIGN_LEFT)
         self.sightInputBox = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
-        self.__widgetMaker(self.sightInputBox, sightQuery)
+        self.__widgetMaker(self.sightInputBox, sights)
         sightInput.Add(sightInputName, 1, wx.ALIGN_CENTER_VERTICAL|wx.FIXED_MINSIZE|wx.LEFT|wx.RIGHT, 5)
         sightInput.Add(self.sightInputBox, 5, wx.EXPAND|wx.LEFT|wx.RIGHT, 5)
         self.sightInputBox.Disable()
@@ -151,8 +144,7 @@ class WeaponLoadoutDialog(wx.Dialog):
         self.socketLoadoutSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Enahncers:"), wx.HORIZONTAL)
         socketLoadout.Add(self.socketLoadoutSizer, 1, wx.EXPAND, 0)
 
-        with Session() as session:
-            enahncerQuery = session.query(EnhancerClass).filter(EnhancerClass.enhancerTypeID == 3)
+        enhancers = loadoutManager.getEnhancers()
 
         self.socket = {}
         socketNames = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']
@@ -168,31 +160,31 @@ class WeaponLoadoutDialog(wx.Dialog):
         "Socket 1 to 5 [section left]"
 
         socketOne = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 1"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["One"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["One"]["Item"], enhancers)
         socketOne.Add(self.socket["One"]["Item"], 1, 0, 0)
         socketOne.Add(self.socket["One"]["Amount"], 0, 0 ,0)
         socketOnetoFive.Add(socketOne, 0, wx.EXPAND, 0)
 
         socketTwo = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 2"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Two"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Two"]["Item"], enhancers)
         socketTwo.Add(self.socket["Two"]["Item"], 1, 0, 0)
         socketTwo.Add(self.socket["Two"]["Amount"], 0, 0 ,0)
         socketOnetoFive.Add(socketTwo, 0, wx.EXPAND, 0)
 
         socketThree = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 3"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Three"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Three"]["Item"], enhancers)
         socketThree.Add(self.socket["Three"]["Item"], 1, 0, 0)
         socketThree.Add(self.socket["Three"]["Amount"], 0, 0 ,0)
         socketOnetoFive.Add(socketThree, 0, wx.EXPAND, 0)
 
         socketFour = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 4"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Four"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Four"]["Item"], enhancers)
         socketFour.Add(self.socket["Four"]["Item"], 1, 0, 0)
         socketFour.Add(self.socket["Four"]["Amount"], 0, 0 ,0)
         socketOnetoFive.Add(socketFour, 0, wx.EXPAND, 0)
 
         socketFive = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 5"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Five"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Five"]["Item"], enhancers)
         socketFive.Add(self.socket["Five"]["Item"], 1, 0, 0)
         socketFive.Add(self.socket["Five"]["Amount"], 0, 0 ,0)
         socketOnetoFive.Add(socketFive, 0, wx.EXPAND, 0)
@@ -203,31 +195,31 @@ class WeaponLoadoutDialog(wx.Dialog):
         "Socket 6 to 10 [section right]"
 
         socketSix = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 6"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Six"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Six"]["Item"], enhancers)
         socketSix.Add(self.socket["Six"]["Item"], 1, 0, 0)
         socketSix.Add(self.socket["Six"]["Amount"], 0, 0 ,0)
         socketSixtoTen.Add(socketSix, 0, wx.EXPAND, 0)
 
         socketSeven = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 7"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Seven"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Seven"]["Item"], enhancers)
         socketSeven.Add(self.socket["Seven"]["Item"], 1, 0, 0)
         socketSeven.Add(self.socket["Seven"]["Amount"], 0, 0 ,0)
         socketSixtoTen.Add(socketSeven, 0, wx.EXPAND, 0)
 
         socketEight = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 8"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Eight"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Eight"]["Item"], enhancers)
         socketEight.Add(self.socket["Eight"]["Item"], 1, 0, 0)
         socketEight.Add(self.socket["Eight"]["Amount"], 0, 0 ,0)
         socketSixtoTen.Add(socketEight, 0, wx.EXPAND, 0)
 
         socketNine = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 9"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Nine"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Nine"]["Item"], enhancers)
         socketNine.Add(self.socket["Nine"]["Item"], 1, 0, 0)
         socketNine.Add(self.socket["Nine"]["Amount"], 0, 0 ,0)
         socketSixtoTen.Add(socketNine, 0, wx.EXPAND, 0)
 
         socketTen = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Socket 10"), wx.HORIZONTAL)
-        self.__widgetMaker(self.socket["Ten"]["Item"], enahncerQuery, True)
+        self.__widgetMaker(self.socket["Ten"]["Item"], enhancers)
         socketTen.Add(self.socket["Ten"]["Item"], 1, 0, 0)
         socketTen.Add(self.socket["Ten"]["Amount"], 0, 0 ,0)
         socketSixtoTen.Add(socketTen, 0, wx.EXPAND, 0)
@@ -269,7 +261,7 @@ class WeaponLoadoutDialog(wx.Dialog):
         for name in self.socket:
             self.socket[name]["Item"].Bind(wx.EVT_COMBOBOX, lambda event, name=name: self.onEnhancerSelect(event, self.socket[name]["Amount"]))
 
-    def __widgetMaker(self, widget, querys, isEnhancer=False):
+    def __widgetMaker(self, widget, querys):
         """
         Clear and populate a wxPython widget with query names or types.
 
@@ -310,13 +302,9 @@ class WeaponLoadoutDialog(wx.Dialog):
         """
         widget.Clear()
         widget.Append("")
-        if isEnhancer != True:
-            value = list(map(lambda query: query.name, querys))
-        else:
-            value = list(map(lambda query: query.getTypeName(), querys))
-        widget.Append(value)
-        for _, obj in enumerate(querys):
-            widget.SetClientData(_ + 1, obj.id)
+        widget.Append(querys[0])
+        for i, id in enumerate(querys[1]):
+            widget.SetClientData(i + 1, id)
 
     def __enableEnhancers(self):
         """
@@ -403,25 +391,25 @@ class WeaponLoadoutDialog(wx.Dialog):
             else:
                 if not self.weaponLoadoutNameInput.IsEmpty():
                     self.buttonSave.Enable()
-                with Session() as session:
-                    selectedWeapon = session.query(Weapons).filter_by(id=selectedWeaponID).first()
-                    print(f"\n\n\n{selectedWeapon.name}\n\n\n") #debug
 
-                    # Amp
-                    self.ampInputBox.Enable()
-                    self.__widgetMaker(self.ampInputBox, selectedWeapon.type.amps)
+                selectedWeapon = loadoutManager.getSelectedWeapon(selectedWeaponID)
+                print(f'\n\n\n{selectedWeapon["weapon"].name}\n\n\n') #debug
 
-                    # Abs
-                    self.absInputBox.Enable()
-                    self.__widgetMaker(self.absInputBox, self.absQuery)
-                    # Enhancer
-                    self.__enableEnhancers()
-                if selectedWeapon.type.type == "laser" or selectedWeapon.type.type == "blp":
+                # Amp
+                self.ampInputBox.Enable()
+                self.__widgetMaker(self.ampInputBox, selectedWeapon["amps"])
+
+                # Abs
+                self.absInputBox.Enable()
+                self.__widgetMaker(self.absInputBox, self.absorbers)
+                # Enhancer
+                self.__enableEnhancers()
+                if selectedWeapon["weapon"].type.type == "laser" or selectedWeapon["weapon"].type.type == "blp":
                     self.scopeInputBox.Enable()
                     self.sightInputBox.Enable()
                 else:
-                    if selectedWeapon.type.type == "melee":
-                        self.__widgetMaker(self.absInputBox, self.absQuery)
+                    if selectedWeapon["weapon"].type.type == "melee":
+                        self.__widgetMaker(self.absInputBox, self.meleeobsorbers)
                     self.scopeInputBox.Disable()
                     self.scopeInputBox.SetSelection(-1)
                     self.scopeSightInputBox.Disable()
@@ -502,66 +490,14 @@ class WeaponLoadoutDialog(wx.Dialog):
         selectedScopeSight = self.scopeSightInputBox.GetClientData(self.scopeSightInputBox.GetSelection()) if self.scopeSightInputBox.GetSelection() != -1 else None
         selectedSight = self.sightInputBox.GetClientData(self.sightInputBox.GetSelection()) if self.sightInputBox.GetSelection() != -1 else None
         selectedEnhancers = []
-        for name in self.socket:
+        for i, name in enumerate(self.socket):
             selectedEnhancers.append([
+                i + 1,
                 self.socket[name]["Item"].GetClientData(self.socket[name]["Item"].GetSelection()) if self.socket[name]["Item"].GetSelection() != -1 else None,
                 self.socket[name]["Amount"].GetValue()
             ])
-        selectedLoadout = [selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers]
-        self.dummySaveLoadout(selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers)
-        print("\n\n\nI SAVED ",selectedLoadout)
+        loadoutManager.setLoadout(selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers)
+        print("\n\n\nI SAVED ",selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers)
         self.EndModal(0)
     
-    """go in business layer"""
-    def dummySaveLoadout(self, selectedName, selectedWeapon, selectedAmp, selectedAbs, selectedScope, selectedScopeSight, selectedSight, selectedEnhancers):
-        with Session() as session:
-
-            enhancerTempIDs = [None] * 10
-            for i, enhancer in enumerate(selectedEnhancers):
-                if enhancer[0] is not None and enhancer[1] != 0:
-                    enhancerLoadout = EnhancerLoadout(
-                        enhancerClassID=enhancer[0],
-                        amount=enhancer[1]
-                    )
-                    session.add(enhancerLoadout)
-                    session.flush()
-                    enhancerTempIDs[i] = enhancerLoadout.id
-
-            scopeLoadout = None
-            if selectedScope is not None:
-                scopeLoadout = ScopeLoadout(
-                        scopeID=selectedScope,
-                        sightID=selectedScopeSight
-                )
-                session.add(scopeLoadout)
-                session.flush()
-            
-            socketLoadout = SocketLoadout(
-                enhancerOneID=enhancerTempIDs[0],
-                enhancerTwoID=enhancerTempIDs[1],
-                enhancerThreeID=enhancerTempIDs[2],
-                enhancerFourID=enhancerTempIDs[3],
-                enhancerFiveID=enhancerTempIDs[4],
-                enhancerSixID=enhancerTempIDs[5],
-                enhancerSevenID=enhancerTempIDs[6],
-                enhancerEightID=enhancerTempIDs[7],
-                enhancerNineID=enhancerTempIDs[8],
-                enhancerTenID=enhancerTempIDs[9]
-            )
-
-            weaponLoadout = WeaponLoadout(
-                name=selectedName,
-                weaponID=selectedWeapon,
-                socketLoadout=socketLoadout,
-                WeaponAmpID=selectedAmp,
-                scopeLoadoutID=scopeLoadout.id if scopeLoadout is not None else None,
-                sightID=selectedSight,
-                absorberID=selectedAbs
-            )
-            session.add(weaponLoadout)
-            
-            """ 
-            TODO add rest of loadout to add, go over db to setup  then casdcade andd orm relations()
-            """
-            session.commit()
-
+    

@@ -11,7 +11,7 @@ mvc layout
 |   |   - Modules (modules used by other functions)\
 |   |   - Views (frontend gui etc.)\
 |   |   - Models (models used by controllers)\
-|   |   - Controllers (interact with data models update)\
+|   |   - Database (database related functions/models)\
 |   |   Lootius.py\
 |   - data (raw data)\
 |   - tests unit tests\
