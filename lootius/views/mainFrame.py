@@ -53,13 +53,13 @@ class LootiusFrame(wx.Frame):
         from models.databaseModel import WeaponLoadout
 
         e = db.DB.getSession()
-        with e() as ses:
-            lol = ses.query(WeaponLoadout).filter(WeaponLoadout.name == "test").first()
-            for enahncer in lol.enhancerLoadout:
-                print (enahncer.enhancerClassID, enahncer.socket)
-            ses.delete(lol)
-            ses.commit()
-        return
+        # with e() as ses:
+        #     lol = ses.query(WeaponLoadout).filter(WeaponLoadout.name == "test").first()
+        #     for enahncer in lol.enhancerLoadout:
+        #         print (enahncer.enhancerClassID, enahncer.socket)
+        #     ses.delete(lol)
+        #     ses.commit()
+        # return
         from os.path import realpath, join, dirname, abspath
         dbPath = realpath(join(dirname(abspath(__file__)), "../database/", "lootiusTest.db"))
 

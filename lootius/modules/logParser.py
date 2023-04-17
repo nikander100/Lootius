@@ -52,9 +52,10 @@ class SkillRow(BaseChatRow):
             self.skill = amount
 
 class EnhancerRow(BaseChatRow):
-    def __init__(self, type):
+    def __init__(self, name, socket):
         super().__init__()
-        self.type = type
+        self.name = name
+        self.socket = socket
 
 class LootRow(BaseChatRow):
     CustomValues = {

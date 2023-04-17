@@ -1,12 +1,12 @@
 import unittest
-from app.modules.logParser import LogLine, parseLogLine
+from lootius.modules.logParser import LogLine, parseLogLine
 
 #run tests using py -m unittest c:/Users/ndvds/Documents/GitHub/Lootius/tests/test_chat.py
 
 class TestLogParsing(unittest.TestCase):
     def _internal(self, line, expected):
-        testLogLine= parseLogLine(line)
-        # print(testLogLine)
+        testLogLine = parseLogLine(line)
+        print(testLogLine)
         self.assertEqual(testLogLine, expected)
 
     def testParseSystemMessage(self):
@@ -37,6 +37,16 @@ class TestLogParsing(unittest.TestCase):
             "System",
             "",
             "You healed yourself 24.0 points"
+        )
+        self._internal(msg, expected)
+
+    def testParseSystemEnhancerMessage(self):
+        msg = "2023-03-30 23:55:18 [System] [] Your enhancer Weapon Skill Modification Enhancer 1 on your Herman ASI TEN Edition broke. You have 27 enhancers remaining on the item. You received 0.6000 PED Shrapnel."
+        expected = LogLine(
+            "2023-03-30 23:55:18",
+            "System",
+            "",
+            "Your enhancer Weapon Skill Modification Enhancer 1 on your Herman ASI TEN Edition broke. You have 27 enhancers remaining on the item. You received 0.6000 PED Shrapnel."
         )
         self._internal(msg, expected)
 

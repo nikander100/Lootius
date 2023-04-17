@@ -185,7 +185,7 @@ def getEnhancers(enhancerType: int = None) -> Tuple[List[str], List[int]]:
     with Session() as session:
         query = session.query(EnhancerClass)
         if enhancerType is not None:
-            query = query.filter(EnhancerClass.enhancerTypeID == 3)
+            query = query.filter(EnhancerClass.enhancerTypeID == enhancerType)
         enhancers = query.all()
         names = [enhancer.type.name for enhancer in enhancers]
         ids = [enhancer.id for enhancer in enhancers]

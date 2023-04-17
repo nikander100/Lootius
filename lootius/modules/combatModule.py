@@ -11,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from modules.baseModule import BaseModule
 from modules.logParser import BaseChatRow, CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
 # from ocr import screenshot_window
+import combatManager, loadoutManager
 
 #dbfilepath to be set in config
 dbFilePath = "/lootius/database/lootiusTest.db"
@@ -22,22 +23,22 @@ DBSession = sessionmaker(LootiusDB)
 # turn this into db table too?
 class HuntingRun(object):
     def __init__(self, timeStart: datetime, costPerShot: Decimal, costPerHeal: Decimal):
-        self.timeStart = timeStart
-        self.timeEnd = None
-        self.notes = ""
+        # self.timeStart = timeStart
+        # self.timeEnd = None
+        # self.notes = ""
         
         # Costs
         self.costPerShot = costPerShot
         self.costPerHeal = costPerHeal
-        self.totalCost = 0
-        self.extraSpend = Decimal(0.0)
+        # self.totalCost = 0
+        # self.extraSpend = Decimal(0.0)
 
         # Returns
-        self.ttReturn = 0
-        self.globals = 0
-        self.hofs = 0
+        # self.ttReturn = 0
+        # self.globals = 0
+        # self.hofs = 0
         self.cachedTotalReturnMu = Decimal("0.0")
-        self.lootItems = defaultdict(lambda: {"c": 0, "v": Decimal()})
+        # self.lootItems = defaultdict(lambda: {"c": 0, "v": Decimal()})
 
         self.lastLootInstance = None
         self.lootInstance = 0
@@ -53,16 +54,16 @@ class HuntingRun(object):
 
 
         # Combat Stats
-        self.totalAttacks = 0
-        self.totalDamage = 0
-        self.totalCrits = 0
-        self.totalMisses = 0
+        # self.totalAttacks = 0
+        # self.totalDamage = 0
+        # self.totalCrits = 0
+        # self.totalMisses = 0
         # Healing Stats
-        self.totalHeals = 0
-        self.totalHealed = 0
+        # self.totalHeals = 0
+        # self.totalHealed = 0
         # Misc Stats
-        self.enhancerBreaks = defaultdict(int)
-        self.skillgains = defaultdict(int)
+        # self.enhancerBreaks = defaultdict(int)
+        # self.skillgains = defaultdict(int)
 
 
 
@@ -90,6 +91,15 @@ class CombatModule(BaseModule):
         # Calculated Conf
         self.ammoBurn = 0
         self.decay = 0
+
+        # exmaple begin\
+        # config = config
+        # config.selectedloadout.id =1
+        # # ofcourse combatmodule has acess to selected loadout from session so can get id form that
+        # selectedWeapon = loadoutManager.getSelectedWeapon(config.selectedloadout.id)
+        # self.ammoBurn = selectedWeapon["weapon"].ammoBurn + selectedWeapon["amps"].ammoBurn
+
+        # example end
 
         # Hunting Runs
         self.activeRun: HuntingRun = None

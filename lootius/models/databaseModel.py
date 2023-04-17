@@ -1,5 +1,6 @@
 from sqlalchemy import TEXT
 from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -111,7 +112,7 @@ class WeaponLoadout(Base):
     __tablename__ = "WeaponLoadout"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(TEXT,unique=True)
+    name: Mapped[str] = mapped_column(TEXT, unique=True)
     weaponID: Mapped[int] = mapped_column(ForeignKey("Weapons.id"))
     amplifierID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponAmps.id"), nullable=True)
     sightID: Mapped[Optional[int]] = mapped_column(ForeignKey("Sights.id"), nullable=True)
@@ -203,3 +204,97 @@ class EnhancerLoadout(Base):
     """
     Combat moddule tables
     """
+
+class LoggingRun(Base):
+    __tablename__ = "LoggingRun"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timeStart: Mapped[int] = mapped_column()
+    timeStop: Mapped[int] = mapped_column()
+    notes: Mapped[int] = mapped_column(TEXT)
+    globalcount: Mapped[int] = mapped_column(default=0)
+    hofcount: Mapped[int] = mapped_column(default=0)
+    costTotal: Mapped[int] = mapped_column(default=0)
+    costExtraSpend: Mapped[int] = mapped_column(default=0)
+    totalHeals: Mapped[int] = mapped_column(default=0)
+    totalHealed: Mapped[float] = mapped_column(default=0.0)
+    totalAttacks: Mapped[int] = mapped_column(default=0)
+    totalDamage: Mapped[float] = mapped_column(default=0.0)
+    totalCrits: Mapped[int] = mapped_column(default=0)
+    totalMisses: Mapped[int] = mapped_column(default=0)
+    skillProcs: Mapped[int] = mapped_column(default=0)
+
+    lootedItems: Mapped[Optional[List["LootItem"]]] = relationship(
+        back_populates="bp_loggingRun",
+        cascade="all, delete, delete-orphan",
+        single_parent=True
+    )
+
+    skillGains: Mapped[Optional[List["SkillItem"]]] = relationship(
+        back_populates="bp_loggingRun",
+        cascade="all, delete, delete-orphan",
+        single_parent=True
+    )
+
+    enhancerBreaks: Mapped[Optional[List["EnhancerItem"]]] = relationship(
+        back_populates="bp_loggingRun",
+        cascade="all, delete, delete-orphan",
+        single_parent=True
+    )
+
+    @property
+    def duration(self):
+        import datetime
+        duration = self.timeStop - self.timeStart if self.timeStop else datetime.now() - self.timeStart
+        return "{}:{}:{}".format(duration.hours, duration.seconds // 60, duration.seconds % 60)
+
+
+
+class LootItem(Base):
+    __tablename__ = "LootItem"
+
+    __table_args__ = (
+        UniqueConstraint('LoggingRunID', 'name', name='uq_loggingRunID_name'),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
+    name: Mapped[int] = mapped_column(TEXT)
+    amount: Mapped[int] = mapped_column(default=0)
+    value: Mapped[float] = mapped_column(default=0.0)
+
+    bp_loggingRun: Mapped["LoggingRun"] = relationship(
+        back_populates="lootedItems",
+    )
+
+class SkillItem(Base):
+    __tablename__ = "SkillItem"
+
+    __table_args__ = (
+        UniqueConstraint('LoggingRunID', 'name', name='uq_loggingRunID_name'),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
+    name: Mapped[int] = mapped_column(TEXT)
+    value: Mapped[float] = mapped_column(default=0.0)
+
+    bp_loggingRun: Mapped["LoggingRun"] = relationship(
+        back_populates="skillGains",
+    )
+
+class EnhancerItem(Base):
+    __tablename__ = "EnhancerItem"
+
+    __table_args__ = (
+        UniqueConstraint('LoggingRunID', 'name', name='uq_loggingRunID_name'),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
+    name: Mapped[int] = mapped_column(TEXT)
+    socket: Mapped[int] = mapped_column()
+
+    bp_loggingRun: Mapped["LoggingRun"] = relationship(
+        back_populates="enhancerBreaks",
+    )
