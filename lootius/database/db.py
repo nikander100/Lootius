@@ -5,6 +5,7 @@ import os, sys, time, sqlalchemy
 from os.path import realpath, join, dirname, abspath
 
 class DB:
+    # TODO get path from config
     dbFilePath = realpath(join(dirname(abspath(__file__)), ".", "lootiusTest.db"))
     print(dbFilePath)
     engine = sqlalchemy.create_engine(f"sqlite+pysqlite:///{dbFilePath}", echo=True)

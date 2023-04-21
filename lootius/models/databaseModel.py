@@ -202,16 +202,17 @@ class EnhancerLoadout(Base):
     )
 
     """
-    Combat moddule tables
+    HuntingRun tables
     """
 
 class LoggingRun(Base):
     __tablename__ = "LoggingRun"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    selectedWeaponLoadoutID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponLoadout.id"))
     timeStart: Mapped[int] = mapped_column()
     timeStop: Mapped[int] = mapped_column()
-    notes: Mapped[int] = mapped_column(TEXT)
+    notes: Mapped[str] = mapped_column(TEXT)
     globalcount: Mapped[int] = mapped_column(default=0)
     hofcount: Mapped[int] = mapped_column(default=0)
     costTotal: Mapped[int] = mapped_column(default=0)
@@ -223,6 +224,10 @@ class LoggingRun(Base):
     totalCrits: Mapped[int] = mapped_column(default=0)
     totalMisses: Mapped[int] = mapped_column(default=0)
     skillProcs: Mapped[int] = mapped_column(default=0)
+
+    selectedWeaponLoadout: Mapped[Optional["WeaponLoadout"]] = relationship(
+        foreign_keys=[selectedWeaponLoadoutID]
+    )
 
     lootedItems: Mapped[Optional[List["LootItem"]]] = relationship(
         back_populates="bp_loggingRun",
@@ -241,12 +246,6 @@ class LoggingRun(Base):
         cascade="all, delete, delete-orphan",
         single_parent=True
     )
-
-    @property
-    def duration(self):
-        import datetime
-        duration = self.timeStop - self.timeStart if self.timeStop else datetime.now() - self.timeStart
-        return "{}:{}:{}".format(duration.hours, duration.seconds // 60, duration.seconds % 60)
 
 
 
@@ -278,6 +277,7 @@ class SkillItem(Base):
     LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
     name: Mapped[int] = mapped_column(TEXT)
     value: Mapped[float] = mapped_column(default=0.0)
+    procs: Mapped[int] = mapped_column()
 
     bp_loggingRun: Mapped["LoggingRun"] = relationship(
         back_populates="skillGains",

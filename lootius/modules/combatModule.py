@@ -23,47 +23,29 @@ DBSession = sessionmaker(LootiusDB)
 # turn this into db table too?
 class HuntingRun(object):
     def __init__(self, timeStart: datetime, costPerShot: Decimal, costPerHeal: Decimal):
-        # self.timeStart = timeStart
-        # self.timeEnd = None
-        # self.notes = ""
-        
-        # Costs
+
+        # Costs [gotten from selected wepaonloadout]
         self.costPerShot = costPerShot
         self.costPerHeal = costPerHeal
-        # self.totalCost = 0
-        # self.extraSpend = Decimal(0.0)
 
-        # Returns
-        # self.ttReturn = 0
-        # self.globals = 0
-        # self.hofs = 0
+
+
+        # Returns [what do with these, figure out?]
         self.cachedTotalReturnMu = Decimal("0.0")
-        # self.lootItems = defaultdict(lambda: {"c": 0, "v": Decimal()})
 
+        #loot instance from chat row. used in calcs
         self.lastLootInstance = None
         self.lootInstance = 0
 
-        # Tracking Multipliers
+        # Tracking Multipliers (for graphs not used atm)
         self.lootInstanceCost = Decimal(0)
         self.lootInstanceValue = Decimal(0)
         self.multiplier = ([], [])
         self.returnOverTime = []
 
-
+        # ???
         self.adjustedCost = Decimal(0)
 
-
-        # Combat Stats
-        # self.totalAttacks = 0
-        # self.totalDamage = 0
-        # self.totalCrits = 0
-        # self.totalMisses = 0
-        # Healing Stats
-        # self.totalHeals = 0
-        # self.totalHealed = 0
-        # Misc Stats
-        # self.enhancerBreaks = defaultdict(int)
-        # self.skillgains = defaultdict(int)
 
 
 

@@ -266,3 +266,7 @@ def getSelectedWeapon(selectedWeaponID: int) -> Dict[str, Union[Weapons, List[Tu
         ampIds = [amp.id for amp in selectedWeapon.type.amps]
         amps = (ampNames, ampIds)
     return {"weapon": selectedWeapon, "amps": amps}
+
+def getCostPerShot(selectedLoadout: WeaponLoadout):
+    pass
+# TODO Make cost per shot function for loadout( returns value of cost per shot including enhancers etc.) reminder needs active session cause lazy loaded requirement
