@@ -60,6 +60,11 @@ class LootiusFrame(wx.Frame):
         #     ses.delete(lol)
         #     ses.commit()
         # return
+        # with e() as session:
+        #     from modules import loadoutManager
+        #     loadout = session.query(WeaponLoadout).filter_by(name="test").first()
+        #     print(loadoutManager.getCostPerShot(loadout))
+        #     return
         from os.path import realpath, join, dirname, abspath
         dbPath = realpath(join(dirname(abspath(__file__)), "../database/", "lootiusTest.db"))
 

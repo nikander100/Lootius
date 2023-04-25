@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 from lootius.database.setup import Setup
 from lootius.models.databaseModel import Base
-import os, sys, time, sqlalchemy
+import sqlalchemy
 from os.path import realpath, join, dirname, abspath
 
 class DB:

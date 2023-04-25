@@ -48,7 +48,7 @@ class Setup:
         enhancerClassCSV = "./data/csv/enhancerClass.csv"
         from lootius.models.databaseModel import EnhancerClass
         df = pandas.read_csv(enhancerClassCSV, sep=";")
-        df = df.rename(columns={"SkillName":"enhancerTypeNameID", "Effect":"enhancerEffectID", "Type":"enhancerTypeID", "TypeName":"enhancerNameID"})
+        df = df.rename(columns={"SkillName":"enhancerTypeNameID", "Effect":"enhancerEffectID", "Type":"enhancerTypeID", "TypeName":"enhancerNameID", "TTValue":"ttValue"})
         df = df.replace(r'^\s*$', 0, regex=True)
         df = df.fillna(0)
         df.to_sql(con=self.engine, name=EnhancerClass.__tablename__, if_exists="append", index=False)

@@ -25,25 +25,29 @@ class HuntingRun(object):
     def __init__(self, timeStart: datetime, costPerShot: Decimal, costPerHeal: Decimal):
 
         # Costs [gotten from selected wepaonloadout]
+        # MOVE TO COMBAT MODULE
         self.costPerShot = costPerShot
         self.costPerHeal = costPerHeal
 
 
 
         # Returns [what do with these, figure out?]
+        # MOVE TO COMBAT MODULE
         self.cachedTotalReturnMu = Decimal("0.0")
 
         #loot instance from chat row. used in calcs
+        # MOVE TO COMBAT MODULE
         self.lastLootInstance = None
         self.lootInstance = 0
 
         # Tracking Multipliers (for graphs not used atm)
+        # MOVE TO COMBAT MODULE???
         self.lootInstanceCost = Decimal(0)
         self.lootInstanceValue = Decimal(0)
         self.multiplier = ([], [])
         self.returnOverTime = []
 
-        # ???
+        # ??? # MOVE TO COMBAT MODULE???
         self.adjustedCost = Decimal(0)
 
 

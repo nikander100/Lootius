@@ -1,4 +1,4 @@
-# Lootius
+# Lootius - name to be changed
  Entropia universe Loot tracker, with more features soonTM
 
 after isntalli8ng wxpython with python 3.11.1

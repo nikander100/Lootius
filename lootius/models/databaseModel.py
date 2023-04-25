@@ -1,4 +1,4 @@
-from sqlalchemy import TEXT
+from sqlalchemy import Text, Numeric
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase
@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from typing import Optional, List
+from decimal import Decimal
 
 """
 # default type mapping, deriving the type for mapped_column()
@@ -39,16 +40,16 @@ class WeaponTypes(Base):
     __tablename__ = "WeaponTypes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[str] =  mapped_column(TEXT)
+    type: Mapped[str] =  mapped_column(Text)
 
 class Weapons(Base):
     __tablename__ = "Weapons"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] =  mapped_column(TEXT)
+    name: Mapped[str] =  mapped_column(Text)
     damage: Mapped[int] = mapped_column(default=0)
     firerate: Mapped[int] = mapped_column(default=0)
-    decay: Mapped[float] = mapped_column(default=0)
+    decay: Mapped[Decimal] = mapped_column(Numeric, default=0)
     ammoBurn: Mapped[int] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
@@ -58,8 +59,8 @@ class Sights(Base):
     __tablename__ = "Sights"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] =  mapped_column(TEXT)
-    decay: Mapped[float] = mapped_column(default=0)
+    name: Mapped[str] =  mapped_column(Text)
+    decay: Mapped[Decimal] = mapped_column(Numeric, default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
     type: Mapped["WeaponTypes"] = relationship(backref="sights")
@@ -68,8 +69,8 @@ class Scopes(Base):
     __tablename__ = "Scopes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] =  mapped_column(TEXT)
-    decay: Mapped[float] = mapped_column(default=0)
+    name: Mapped[str] =  mapped_column(Text)
+    decay: Mapped[Decimal] = mapped_column(Numeric, default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
     type: Mapped["WeaponTypes"] = relationship(backref="scopes")
@@ -78,8 +79,8 @@ class WeaponAmps(Base):
     __tablename__ = "WeaponAmps"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] =  mapped_column(TEXT)
-    decay: Mapped[float] = mapped_column(default=0)
+    name: Mapped[str] =  mapped_column(Text)
+    decay: Mapped[Decimal] = mapped_column(Numeric, default=0)
     ammoBurn: Mapped[int] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
@@ -89,8 +90,8 @@ class WeaponAbsorbers(Base):
     __tablename__ = "WeaponAbsorbers"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] =  mapped_column(TEXT)
-    decay: Mapped[float] = mapped_column(default=0)
+    name: Mapped[str] =  mapped_column(Text)
+    decay: Mapped[Decimal] = mapped_column(Numeric, default=0)
     absorbPercent: Mapped[float] = mapped_column(default=0)
     weaponTypeID: Mapped[int] = mapped_column(ForeignKey("WeaponTypes.id"))
 
@@ -108,11 +109,18 @@ class ScopeLoadout(Base):
         back_populates="scopeLoadout",
     )
 
+    scope: Mapped[Optional["Scopes"]] = relationship(
+        foreign_keys=[scopeID]
+    )
+
+    sight: Mapped[Optional["Sights"]] = relationship(
+        foreign_keys=[sightID])
+
 class WeaponLoadout(Base):
     __tablename__ = "WeaponLoadout"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(TEXT, unique=True)
+    name: Mapped[str] = mapped_column(Text, unique=True)
     weaponID: Mapped[int] = mapped_column(ForeignKey("Weapons.id"))
     amplifierID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponAmps.id"), nullable=True)
     sightID: Mapped[Optional[int]] = mapped_column(ForeignKey("Sights.id"), nullable=True)
@@ -158,21 +166,21 @@ class EnhancerNames(Base):
     __tablename__ = "EnhancerNames"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(TEXT)
+    name: Mapped[str] = mapped_column(Text)
 
 
 class EnhancerTypeNames(Base):
     __tablename__ = "EnhancerTypeNames"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(TEXT)
+    name: Mapped[str] = mapped_column(Text)
 
 
 class EnhancerTypes(Base):
     __tablename__ = "EnhancerTypes"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[str] = mapped_column(TEXT)
+    type: Mapped[str] = mapped_column(Text)
 
 
 class EnhancerClass(Base):
@@ -183,6 +191,7 @@ class EnhancerClass(Base):
     enhancerTypeNameID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypeNames.id"))
     enhancerEffectID: Mapped[int] = mapped_column(ForeignKey("EnhancerEffects.id"), default=1)
     enhancerTypeID: Mapped[int] = mapped_column(ForeignKey("EnhancerTypes.id"))
+    ttValue: Mapped[float] = mapped_column(Numeric)
 
     type: Mapped["EnhancerTypeNames"] = relationship(foreign_keys=[enhancerTypeNameID])
     effect: Mapped["EnhancerEffects"] = relationship(foreign_keys=[enhancerEffectID])
@@ -212,7 +221,7 @@ class LoggingRun(Base):
     selectedWeaponLoadoutID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponLoadout.id"))
     timeStart: Mapped[int] = mapped_column()
     timeStop: Mapped[int] = mapped_column()
-    notes: Mapped[str] = mapped_column(TEXT)
+    notes: Mapped[str] = mapped_column(Text)
     globalcount: Mapped[int] = mapped_column(default=0)
     hofcount: Mapped[int] = mapped_column(default=0)
     costTotal: Mapped[int] = mapped_column(default=0)
@@ -258,7 +267,7 @@ class LootItem(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
-    name: Mapped[int] = mapped_column(TEXT)
+    name: Mapped[int] = mapped_column(Text)
     amount: Mapped[int] = mapped_column(default=0)
     value: Mapped[float] = mapped_column(default=0.0)
 
@@ -275,7 +284,7 @@ class SkillItem(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
-    name: Mapped[int] = mapped_column(TEXT)
+    name: Mapped[int] = mapped_column(Text)
     value: Mapped[float] = mapped_column(default=0.0)
     procs: Mapped[int] = mapped_column()
 
@@ -292,7 +301,7 @@ class EnhancerItem(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
-    name: Mapped[int] = mapped_column(TEXT)
+    name: Mapped[int] = mapped_column(Text)
     socket: Mapped[int] = mapped_column()
 
     bp_loggingRun: Mapped["LoggingRun"] = relationship(

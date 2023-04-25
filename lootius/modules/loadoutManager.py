@@ -33,6 +33,7 @@ def getSelectedWeapon(selectedWeaponID: int) -> Dict[str, Union[Weapons, List[Tu
 from models.databaseModel import Weapons, Sights, Scopes, EnhancerClass, WeaponAbsorbers, WeaponLoadout, ScopeLoadout, EnhancerLoadout, WeaponAmps
 from database import db
 from typing import List, Tuple, Dict, Union, Optional
+from decimal import Decimal
 from sqlalchemy.orm import joinedload
 
 Session = db.DB.getSession()
@@ -267,6 +268,68 @@ def getSelectedWeapon(selectedWeaponID: int) -> Dict[str, Union[Weapons, List[Tu
         amps = (ampNames, ampIds)
     return {"weapon": selectedWeapon, "amps": amps}
 
-def getCostPerShot(selectedLoadout: WeaponLoadout):
-    pass
-# TODO Make cost per shot function for loadout( returns value of cost per shot including enhancers etc.) reminder needs active session cause lazy loaded requirement
+def getCostPerShot(Loadout: WeaponLoadout):
+    """
+    Calculates the cost per shot for a given WeaponLoadout.
+
+    Parameters
+    ----------
+    Loadout : WeaponLoadout
+        The loadout for which the cost per shot needs to be calculated.
+
+    Returns
+    -------
+    Decimal
+        The cost per shot for the given WeaponLoadout in PECs.
+
+    Examples
+    --------
+    >>> loadout = session.query(WeaponLoadout).filter_by(id=1).first()
+    >>> getCostPerShot(loadout)
+    Decimal('0.23')
+    """
+    costPerShot = None
+    with Session() as session:
+        selectedLoadout = session.query(WeaponLoadout).filter_by(id=Loadout.id).first()
+
+        weaponDecay = None
+        weaponAmmoBurn = None
+        damageEnhancers = 0
+        economyEnhancers = 0
+        enhancerValue = 0
+
+        # get enhancers that effect cost and set tt value of all enhancers
+        for enhancers in selectedLoadout.enhancerLoadout:
+            if enhancers.enhancer.type.name == "Damage":
+                damageEnhancers += 1
+            if enhancers.enhancer.type.name == "Economy":
+                economyEnhancers += 1
+            enhancerValue += enhancers.enhancer.ttValue
+        
+        # set multiplier for cost
+        enhancerMultiplier = 1 + ((0.1 * damageEnhancers) - (0.01 * economyEnhancers))
+
+        # set actual decay based on enhancerMultilpier
+        weaponDecay = selectedLoadout.weapon.decay * Decimal(enhancerMultiplier)
+        weaponAmmoBurn = selectedLoadout.weapon.ammoBurn * enhancerMultiplier
+
+        # add amp costs
+        if selectedLoadout.amplifier is not None:
+            weaponDecay += selectedLoadout.amplifier.decay
+            weaponAmmoBurn += selectedLoadout.amplifier.ammoBurn
+        
+        # add sight costs
+        if selectedLoadout.sight is not None:
+            weaponDecay += selectedLoadout.sight.decay
+        
+        # add scope cost
+        if selectedLoadout.scopeLoadout is not None:
+            weaponDecay += selectedLoadout.scopeLoadout.scope.decay
+            if selectedLoadout.scopeLoadout.sight is not None:
+                weaponDecay += selectedLoadout.scopeLoadout.sight.decay
+
+        # calc cost per shot in pecs (also include price of enahncer braking based on the 2500 brake rate of the wiki and tt value of enhancer)
+        costPerShot = (Decimal(weaponAmmoBurn) / Decimal(10000)) + (weaponDecay / Decimal(100)) + Decimal(enhancerValue / 2500)
+
+        #TODO Redo documentation
+        return costPerShot
