@@ -50,9 +50,9 @@ class LootiusFrame(wx.Frame):
     def resetDb(event):
         from time import sleep
         from database import db
+        from database.db import LocalSession
         from models.databaseModel import WeaponLoadout
 
-        e = db.DB.getSession()
         # with e() as ses:
         #     lol = ses.query(WeaponLoadout).filter(WeaponLoadout.name == "test").first()
         #     for enahncer in lol.enhancerLoadout:
@@ -60,11 +60,12 @@ class LootiusFrame(wx.Frame):
         #     ses.delete(lol)
         #     ses.commit()
         # return
-        # with e() as session:
-        #     from modules import loadoutManager
-        #     loadout = session.query(WeaponLoadout).filter_by(name="test").first()
-        #     print(loadoutManager.getCostPerShot(loadout))
-        #     return
+
+        # from modules import loadoutManager
+        # loadout = LocalSession.query(WeaponLoadout).filter_by(name="test").first()
+        # print("\n\n\n\n\n\n\n\n\n\n",loadoutManager.getCostPerShot(loadout))
+        # return
+    
         from os.path import realpath, join, dirname, abspath
         dbPath = realpath(join(dirname(abspath(__file__)), "../database/", "lootiusTest.db"))
 

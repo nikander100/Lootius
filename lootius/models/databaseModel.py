@@ -218,7 +218,6 @@ class LoggingRun(Base):
     __tablename__ = "LoggingRun"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    selectedWeaponLoadoutID: Mapped[Optional[int]] = mapped_column(ForeignKey("WeaponLoadout.id"))
     timeStart: Mapped[int] = mapped_column()
     timeStop: Mapped[int] = mapped_column()
     notes: Mapped[str] = mapped_column(Text)
@@ -233,10 +232,6 @@ class LoggingRun(Base):
     totalCrits: Mapped[int] = mapped_column(default=0)
     totalMisses: Mapped[int] = mapped_column(default=0)
     skillProcs: Mapped[int] = mapped_column(default=0)
-
-    selectedWeaponLoadout: Mapped[Optional["WeaponLoadout"]] = relationship(
-        foreign_keys=[selectedWeaponLoadoutID]
-    )
 
     lootedItems: Mapped[Optional[List["LootItem"]]] = relationship(
         back_populates="bp_loggingRun",

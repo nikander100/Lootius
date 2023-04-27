@@ -1,24 +1,22 @@
 from collections import namedtuple, defaultdict
 from datetime import datetime
-import time
 from decimal import Decimal
 from typing import List
 import threading
+import time
 import os
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session
+from database import db
+from database.db import LocalSession
 
 from modules.baseModule import BaseModule
 from modules.logParser import BaseChatRow, CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
+from models.databaseModel import *
 # from ocr import screenshot_window
 import combatManager, loadoutManager
 
-#dbfilepath to be set in config
-dbFilePath = "/lootius/database/lootiusTest.db"
-"C://Users/ndvds/Documents/GitHub/Lootius/lootius/database/lootiusTest.db"
-LootiusDB = sqlalchemy.create_engine(f"sqlite+pysqlite://{dbFilePath}", echo=True)
-#use with DBSession.begin() as ... to interact with db
-DBSession = sessionmaker(LootiusDB)
+
 
 # turn this into db table too?
 class HuntingRun(object):
@@ -62,7 +60,7 @@ class CombatModule(BaseModule):
         self.isLogging = False
         self.shouldRedrawRuns = True
 
-        # Set by Parent
+        # Set by Parent in lootnan (what should i do?) think this is all frontend
         self.lootTable = None #table? maybe need to change to db connection
         self.runsTable = None #table? maybe need to change to db connection
         self.skillsTable = None #table? maybe need to change to db connection
@@ -71,12 +69,8 @@ class CombatModule(BaseModule):
         self.lootField = {}
 
         # Loadout Types
-        self.weaponLoadout = None
-        self.healingLoadout = None
-
-        # Calculated Conf
-        self.ammoBurn = 0
-        self.decay = 0
+        # TODO get value from selected ui
+        self.weaponLoadout = combatManager.setActiveWeaponLoadout(1)
 
         # exmaple begin\
         # config = config
@@ -87,13 +81,16 @@ class CombatModule(BaseModule):
 
         # example end
 
-        # Hunting Runs
+        # TODO Hunting Runs (change to db object, so need active session!)
         self.activeRun: HuntingRun = None
-        self.runs: List[HuntingRun] = []
 
         # Graphs
         self.multiplierGraph = None
         self.returnGraph = None
 
-        # Keypress
-        self.lastKeyPress = None
+    def tick(self, lines: List[BaseChatRow]):
+        if self.isLogging is True:
+
+            if self.activeRun is None:
+                self.activeRun = LoggingRun
+
