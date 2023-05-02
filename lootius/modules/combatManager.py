@@ -5,6 +5,7 @@ from decimal import Decimal
 from sqlalchemy import func
 import datetime
 
+from modules.logParser import CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
 
 #TODO maybe need to allow both id and WeaponLoadout class object as input.
 def setActiveWeaponLoadout(weaponLoadoutID: int) -> WeaponLoadout:

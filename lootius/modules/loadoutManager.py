@@ -292,6 +292,7 @@ def getSelectedWeapon(selectedWeaponID: int) -> Dict[str, Union[Weapons, List[Tu
 
     return {"weapon": selectedWeapon, "amps": amps}
 
+# TODO (long term) eventually also keep track of weapons that can reach over 100 attacks / min. as the game has a hard cap on 100 attacks per minute and then decay and ammo burn goes up.
 def getCostPerShot(loadout: Union[WeaponLoadout, int]):
     """
     Calculate the cost per shot for a given WeaponLoadout.

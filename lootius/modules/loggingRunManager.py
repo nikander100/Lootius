@@ -5,6 +5,8 @@ from decimal import Decimal
 from sqlalchemy import func
 import datetime
 
+from modules.logParser import CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
+
 def getDuration(huntingLog: LoggingRun) -> str:
     """Return the duration of a hunting session.
 
@@ -135,3 +137,14 @@ def getTotalSkillsGained(huntingLog: LoggingRun) -> Decimal:
     totalSkillsGained = LocalSession.query(func.sum(SkillItem.value)).filter_by(LoggingRunID=huntingLog.id).scalar()
 
     return Decimal(totalSkillsGained) if totalSkillsGained is not None else Decimal(0)
+
+
+
+def addCombatRow(huntingLog: LoggingRun, row: CombatRow, costPerShot: Decimal):
+    huntingLog.totalAttacks += 1
+    huntingLog.totalDamage += row.amount
+    if row.critical:
+        huntingLog.totalCrits += 1
+    if row.miss:
+        huntingLog.totalMisses += 1
+    huntingLog.costTotal += costPerShot

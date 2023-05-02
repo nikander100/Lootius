@@ -2,7 +2,6 @@ import wx
 import wx.adv 
 import webbrowser
 
-from modules.logParser import ChatLogParser
 from views.mainMenuBar import mainMenuBar
 from views.preferenceDialog import PreferenceDialog
 from views.weaponLoadoutDialog import WeaponLoadoutDialog
@@ -13,15 +12,18 @@ TODO Add min size for frame
 """
 class LootiusFrame(wx.Frame):
 
-    def __init__(self, title="Lootius", size=(320, 160, 1280, 720)):
+    def __init__(self, app, title="Lootius", size=(320, 160, 1280, 720)):
         # ensure the parent's __init__ is called
         self.title = title
         super().__init__(None, wx.ID_ANY, self.title)
+        self.app = app
         self.Size = size
         self.SetBackgroundColour(wx.Colour(30,30,30))
 
         # Modules
-        self.chatLogParser = ChatLogParser(self)
+        # self.chatLogParser = ChatLogParser(self)
+        self.chatLogParser = self.app.chatLogParser
+        # self.app.chatLogParser...
 
         # create a panel in the frame
         # pnl = wx.Panel(self);
@@ -69,7 +71,7 @@ class LootiusFrame(wx.Frame):
         from os.path import realpath, join, dirname, abspath
         dbPath = realpath(join(dirname(abspath(__file__)), "../database/", "lootiusTest.db"))
 
-        db.DB.dropAll()
+        db.dropAll()
         print("\n\n\nDeleted DATABASE\n\n\n")
         sleep(3)
         db.Setup.run(dbPath)

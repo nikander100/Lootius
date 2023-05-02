@@ -26,14 +26,14 @@ if __name__ == '__main__':
         db.Setup.run(dbPath)
     else:
         print("db exists")
-    # Session = db.DB.getSession()
+    # Session = db.getSession()
 
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.
     from views.app import LootiusApp
     lootius = LootiusApp()
     from views.mainFrame import LootiusFrame
-    frm = LootiusFrame()
+    frm = LootiusFrame(app=lootius)
     lootius.SetTopWindow(frm)
     frm.Show();
     lootius.MainLoop();

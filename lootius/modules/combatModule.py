@@ -14,7 +14,7 @@ from modules.baseModule import BaseModule
 from modules.logParser import BaseChatRow, CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
 from models.databaseModel import *
 # from ocr import screenshot_window
-import combatManager, loadoutManager
+import combatManager, loadoutManager, loggingRunManager
 
 
 
@@ -35,7 +35,7 @@ class HuntingRun(object):
 
         #loot instance from chat row. used in calcs
         # MOVE TO COMBAT MODULE
-        self.lastLootInstance = None
+
         self.lootInstance = 0
 
         # Tracking Multipliers (for graphs not used atm)
@@ -60,6 +60,12 @@ class CombatModule(BaseModule):
         self.isLogging = False
         self.shouldRedrawRuns = True
 
+        # Loot instance
+        self.lastLootInstance = None
+        self.lootInstance = 0
+        self.lootInstanceCost = Decimal(0)
+        self.lootInstanceValue = Decimal(0)
+
         # Set by Parent in lootnan (what should i do?) think this is all frontend
         self.lootTable = None #table? maybe need to change to db connection
         self.runsTable = None #table? maybe need to change to db connection
@@ -72,6 +78,8 @@ class CombatModule(BaseModule):
         # TODO get value from selected ui
         self.weaponLoadout = combatManager.setActiveWeaponLoadout(1)
 
+        self.costPerShot = loadoutManager.getCostPerShot(self.weaponLoadout)
+
         # exmaple begin\
         # config = config
         # config.selectedloadout.id =1
@@ -82,15 +90,27 @@ class CombatModule(BaseModule):
         # example end
 
         # TODO Hunting Runs (change to db object, so need active session!)
-        self.activeRun: HuntingRun = None
+        self.activeRun: LoggingRun = None
 
         # Graphs
         self.multiplierGraph = None
         self.returnGraph = None
 
+    # TODO check where and how to add new data to database, I kinda wanted to so a seperate save function that runs every 10-15 sec on a seperate thread
+    # but maybe I might as well do it on the end of every tick, as not to many lines are added at once. and as it is local it shouldnt hold the rest,
+    # i will try this first and if it does end up breaking. im gonn ahev to remake / think some tings
     def tick(self, lines: List[BaseChatRow]):
         if self.isLogging is True:
 
             if self.activeRun is None:
                 self.activeRun = LoggingRun
+            
+            for chatInstance in lines:
+                if isinstance(chatInstance, CombatRow):
+                    self.addCombatChatRow(LoggingRun, chatInstance)
+
+    def addCombatChatRow(self, huntingLog: LoggingRun, row: CombatRow):
+        self.lootInstanceCost += self.costPerShot
+        loggingRunManager.addCombatRow(huntingLog, row, self.costPerShot)
+                    
 
