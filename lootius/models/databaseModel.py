@@ -251,6 +251,17 @@ class LoggingRun(Base):
         single_parent=True
     )
 
+    multiplierGraph: Mapped[Optional[List["MultiplierGraphData"]]] = relationship(
+        back_populates="bp_loggingRun",
+        cascade="all, delete, delete-orphan",
+        single_parent=True
+    )
+
+    returnOverTimeGraph: Mapped[Optional[List["ReturnOverTimeGraphData"]]] = relationship(
+        back_populates="bp_loggingRun",
+        cascade="all, delete, delete-orphan",
+        single_parent=True
+    )
 
 
 class LootItem(Base):
@@ -301,4 +312,30 @@ class EnhancerItem(Base):
 
     bp_loggingRun: Mapped["LoggingRun"] = relationship(
         back_populates="enhancerBreaks",
+    )
+
+# graphs from runs
+class MultiplierGraphData(Base):
+    __tablename__ = "MultiplierGraphData"
+
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
+    lootInstanceCost: Mapped[float] = mapped_column(float)
+    lootInstanceValue: Mapped[float] = mapped_column(float)
+
+    bp_loggingRun: Mapped["LoggingRun"] = relationship(
+        back_populates="multiplierGraphData",
+    )
+
+class ReturnOverTimeGraphData(Base):
+    __tablename__ = "ReturnOverTimeGraphData"
+
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
+    returnOverTime: Mapped[float] = mapped_column(float)
+
+    bp_loggingRun: Mapped["LoggingRun"] = relationship(
+        back_populates="returnOverTimeGraph",
     )

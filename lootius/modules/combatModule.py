@@ -33,18 +33,6 @@ class HuntingRun(object):
         # MOVE TO COMBAT MODULE
         self.cachedTotalReturnMu = Decimal("0.0")
 
-        #loot instance from chat row. used in calcs
-        # MOVE TO COMBAT MODULE
-
-        self.lootInstance = 0
-
-        # Tracking Multipliers (for graphs not used atm)
-        # MOVE TO COMBAT MODULE???
-        self.lootInstanceCost = Decimal(0)
-        self.lootInstanceValue = Decimal(0)
-        self.multiplier = ([], [])
-        self.returnOverTime = []
-
         # ??? # MOVE TO COMBAT MODULE???
         self.adjustedCost = Decimal(0)
 
@@ -62,9 +50,10 @@ class CombatModule(BaseModule):
 
         # Loot instance
         self.lastLootInstance = None
-        self.lootInstance = 0
+        # Tracking Multipliers (for graphs not used atm)
         self.lootInstanceCost = Decimal(0)
         self.lootInstanceValue = Decimal(0)
+        self.multiplier = (int, float, float) # if run selected get from db and store to db add end of run.
 
         # Set by Parent in lootnan (what should i do?) think this is all frontend
         self.lootTable = None #table? maybe need to change to db connection
@@ -112,5 +101,30 @@ class CombatModule(BaseModule):
     def addCombatChatRow(self, huntingLog: LoggingRun, row: CombatRow):
         self.lootInstanceCost += self.costPerShot
         loggingRunManager.addCombatRow(huntingLog, row, self.costPerShot)
-                    
+
+    def addLootChatRow(self, huntingLog: LoggingRun, row: LootRow):
+        ts = time.mktime(row.time.timetuple()) // 2
+        
+        # We dont want to consider sharp conversion as a loot event
+        # TODO Make a function / list to reffernce to to check if it sohuld not be part as loot event. e.a convert, keys, boxes, probes, etc.
+        if row.name == "Universal Ammo":
+            return
+        
+        if self.last_loot_instance != ts:
+            if row.name == "Vibrant Sweat":
+                # Dont count sweat as a loot instance
+                pass
+            elif row.name == "Shrapnel" and row.amount in {4000, 6000, 8000, 10000}:
+                # If looks like an enhancer break
+                pass  # But we still add the shrapnel back to the total items looted | enhancer break
+            else:
+                self.lastLootInstance = ts
+
+                loggingRunManager.addLootRow(huntingLog, row, self.lootInstanceCost, self.lootInstanceValue)
+                if self.lootInstanceValue and self.lootInstanceCost:
+                    self.lootInstanceCost = Decimal(0)
+                    self.lootInstanceValue = Decimal(0)
+        
+        self.lootInstanceValue += row.value
+
 

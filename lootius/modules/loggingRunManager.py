@@ -3,6 +3,7 @@ from database.db import LocalSession
 from models.databaseModel import *
 from decimal import Decimal
 from sqlalchemy import func
+from typing import Optional
 import datetime
 
 from modules.logParser import CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
@@ -138,6 +139,16 @@ def getTotalSkillsGained(huntingLog: LoggingRun) -> Decimal:
 
     return Decimal(totalSkillsGained) if totalSkillsGained is not None else Decimal(0)
 
+def getTotalTtReturn(huntingLog: LoggingRun) -> int:
+    totalTtReturn = LocalSession.query(func.sum(LootItem.value)).filter_by(LoggingRunID=huntingLog.id).scalar()
+
+    return totalTtReturn
+
+
+# TODO make fucntion to get total amount lootinstances in run
+def getTotalLootInstances():
+    pass
+
 
 
 def addCombatRow(huntingLog: LoggingRun, row: CombatRow, costPerShot: Decimal):
@@ -148,3 +159,26 @@ def addCombatRow(huntingLog: LoggingRun, row: CombatRow, costPerShot: Decimal):
     if row.miss:
         huntingLog.totalMisses += 1
     huntingLog.costTotal += costPerShot
+
+def addLootRow(huntingLog: LoggingRun, row: LootRow, cost: float, value: float):
+
+    if cost != 0 and value != 0:
+        huntingLog.multiplierGraph.append(
+            MultiplierGraphData(
+            lootInstanceCost=float(cost),
+            lootInstanceValue=float(value)
+            )
+        )
+        huntingLog.multiplierGraph.append(
+            ReturnOverTimeGraphData(
+            returnOverTime=float(getTotalTtReturn(huntingLog) / huntingLog.costTotal)
+            )
+        )
+    
+    huntingLog.lootedItems.append(
+        LootItem(
+        name=row.name,
+        amount=row.amount,
+        value=row.value
+        )
+    )
