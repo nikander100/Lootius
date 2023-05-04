@@ -182,3 +182,25 @@ def addLootRow(huntingLog: LoggingRun, row: LootRow, cost: float, value: float):
         value=row.value
         )
     )
+
+def addEnhancerRow(huntingLog: LoggingRun, row: EnhancerRow):
+    huntingLog.lootedItems.append(
+        EnhancerItem(
+        name=row.name,
+        socket=row.socket
+        )
+    )
+
+def addSkillRow(huntingLog: LoggingRun, row: SkillRow):
+    huntingLog.skillGains.append(
+        SkillItem(
+        amount=row.amount,
+        skill=row.skill
+        )
+    )
+
+def addGlobalRow(huntingLog: LoggingRun, row: GlobalRow):
+    if row.hof:
+        huntingLog.hofcount += 1
+    else:
+        huntingLog.globalcount += 1

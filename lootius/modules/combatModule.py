@@ -97,6 +97,25 @@ class CombatModule(BaseModule):
             for chatInstance in lines:
                 if isinstance(chatInstance, CombatRow):
                     self.addCombatChatRow(LoggingRun, chatInstance)
+                # add heal row here after first working version.
+                elif isinstance(chatInstance, LootRow):
+                    self.addLootChatRow(LoggingRun, chatInstance)
+                elif isinstance(chatInstance, EnhancerRow):
+                    self.addEnhancerChatRow(LoggingRun, chatInstance)
+                elif isinstance(chatInstance, SkillRow):
+                    self.addSkillChatRow(LoggingRun, chatInstance)
+                elif isinstance(chatInstance, GlobalRow):
+                    self.addGlobalChatRow(LoggingRun, chatInstance)
+                
+            '''if self.app.streamer_window:
+                self.app.streamer_window.set_text_from_module(self)
+
+                part of original code, have to implment this still.
+                part of ui code.
+
+        if self.runs and self.should_redraw_runs:
+            self.update_tables()
+            self.should_redraw_runs = False'''
 
     def addCombatChatRow(self, huntingLog: LoggingRun, row: CombatRow):
         self.lootInstanceCost += self.costPerShot
@@ -126,5 +145,18 @@ class CombatModule(BaseModule):
                     self.lootInstanceValue = Decimal(0)
         
         self.lootInstanceValue += row.value
+    
+    def addEnhancerChatRow(self, huntingLog: LoggingRun, row: EnhancerRow):
+        loggingRunManager.addEnhancerRow(huntingLog, row)
+
+    def addSkillChatRow(self, huntingLog: LoggingRun, row: SkillRow):
+        loggingRunManager.addSkillRow(huntingLog, row)
+
+    def addGlobalChatRow(self, huntingLog: LoggingRun, row: GlobalRow):
+        #add is statement for chekcing if global name == player or list plaer/team names.
+        #add screenshot module and trigger it.
+        loggingRunManager.addGlobalRow(huntingLog, row)
+        # possibly add more to this later, maybe not needed though.
+
 
 
