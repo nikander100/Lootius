@@ -8,6 +8,14 @@ import datetime
 
 from modules.logParser import CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
 
+def createNewRun() -> LoggingRun:
+    newRun = LoggingRun(
+        timestart=datetime.now()
+    )
+    LocalSession.add(newRun)
+    LocalSession.flush()
+    return newRun
+
 def getDuration(huntingLog: LoggingRun) -> str:
     """Return the duration of a hunting session.
 

@@ -92,7 +92,7 @@ class CombatModule(BaseModule):
         if self.isLogging is True:
 
             if self.activeRun is None:
-                self.activeRun = LoggingRun
+                self.activeRun = loggingRunManager.createNewRun()
             
             for chatInstance in lines:
                 if isinstance(chatInstance, CombatRow):
@@ -158,5 +158,10 @@ class CombatModule(BaseModule):
         loggingRunManager.addGlobalRow(huntingLog, row)
         # possibly add more to this later, maybe not needed though.
 
-
+    def saveActiveRun(self, force=False):
+        if not self.activeRun:
+            if not force:
+                return
+            combatManager.saveRun(self.activeRun)
+        pass
 

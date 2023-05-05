@@ -11,3 +11,7 @@ from modules.logParser import CombatRow, LootRow, SkillRow, HealRow, GlobalRow, 
 def setActiveWeaponLoadout(weaponLoadoutID: int) -> WeaponLoadout:
     activeLoadout = LocalSession.query(WeaponLoadout).filter_by(id=weaponLoadoutID)
     return activeLoadout
+
+def saveRun(huntingLog: LoggingRun, force=False):
+    LocalSession.add(huntingLog)
+    LocalSession.commit()
