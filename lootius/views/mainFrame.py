@@ -73,7 +73,7 @@ class LootiusFrame(wx.Frame):
 
         db.dropAll()
         print("\n\n\nDeleted DATABASE\n\n\n")
-        sleep(3)
+        sleep(1.2)
         db.Setup.run(dbPath)
         print("\n\n\nRemade DATABASE\n\n\n")
     #end tmp

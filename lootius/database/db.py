@@ -11,12 +11,12 @@ engine = sqlalchemy.create_engine(f"sqlite+pysqlite:///{dbFilePath}", echo=True)
 SessionFactory = sessionmaker(engine)
 LocalSession = scoped_session(SessionFactory)
 
-def getSession(void):
+def getSession():
     """Returns new Session.
     For the given session can also start: with Session. and include begin()/commit()/rollback()
     then dont have to commit, etc. manually"""
     return (sessionmaker(engine))
     
 
-def dropAll(void):
+def dropAll():
     sqlalchemy.MetaData.drop_all(Base.metadata, bind=engine)

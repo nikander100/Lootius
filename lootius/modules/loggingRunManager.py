@@ -177,12 +177,13 @@ def addLootRow(huntingLog: LoggingRun, row: LootRow, cost: float, value: float):
             lootInstanceValue=float(value)
             )
         )
-        huntingLog.multiplierGraph.append(
+        
+        huntingLog.returnOverTimeGraph.append(
             ReturnOverTimeGraphData(
             returnOverTime=float(getTotalTtReturn(huntingLog) / huntingLog.costTotal)
             )
         )
-    
+
     huntingLog.lootedItems.append(
         LootItem(
         name=row.name,

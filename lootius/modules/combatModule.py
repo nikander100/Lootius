@@ -14,7 +14,9 @@ from modules.baseModule import BaseModule
 from modules.logParser import BaseChatRow, CombatRow, LootRow, SkillRow, HealRow, GlobalRow, EnhancerRow
 from models.databaseModel import *
 # from ocr import screenshot_window
-import combatManager, loadoutManager, loggingRunManager
+import modules.combatManager as combatManager
+import modules.loadoutManager as loadoutManager
+import modules.loggingRunManager as loggingRunManager
 
 
 
@@ -46,28 +48,21 @@ class CombatModule(BaseModule):
 
         # Core Controls
         self.isLogging = False
-        self.shouldRedrawRuns = True
+        # self.shouldRedrawRuns = True
 
         # Loot instance
         self.lastLootInstance = None
         # Tracking Multipliers (for graphs not used atm)
         self.lootInstanceCost = Decimal(0)
         self.lootInstanceValue = Decimal(0)
-        self.multiplier = (int, float, float) # if run selected get from db and store to db add end of run.
 
-        # Set by Parent in lootnan (what should i do?) think this is all frontend
-        self.lootTable = None #table? maybe need to change to db connection
-        self.runsTable = None #table? maybe need to change to db connection
-        self.skillsTable = None #table? maybe need to change to db connection
-        self.enhancerTable = None #table? maybe need to change to db connection (part of weaponloadout)
-        self.combatFields = {}
-        self.lootField = {}
 
         # Loadout Types
         # TODO get value from selected ui
-        self.weaponLoadout = combatManager.setActiveWeaponLoadout(1)
+        # self.weaponLoadout = combatManager.setActiveWeaponLoadout(1)
+        self.weaponLoadout = None
 
-        self.costPerShot = loadoutManager.getCostPerShot(self.weaponLoadout)
+        self.costPerShot = loadoutManager.getCostPerShot(self.weaponLoadout) if self.weaponLoadout else None
 
         # exmaple begin\
         # config = config
@@ -80,10 +75,6 @@ class CombatModule(BaseModule):
 
         # TODO Hunting Runs (change to db object, so need active session!)
         self.activeRun: LoggingRun = None
-
-        # Graphs
-        self.multiplierGraph = None
-        self.returnGraph = None
 
     # TODO check where and how to add new data to database, I kinda wanted to so a seperate save function that runs every 10-15 sec on a seperate thread
     # but maybe I might as well do it on the end of every tick, as not to many lines are added at once. and as it is local it shouldnt hold the rest,
@@ -107,11 +98,12 @@ class CombatModule(BaseModule):
                 elif isinstance(chatInstance, GlobalRow):
                     self.addGlobalChatRow(LoggingRun, chatInstance)
                 
+            #from lootnan
             '''if self.app.streamer_window:
                 self.app.streamer_window.set_text_from_module(self)
 
                 part of original code, have to implment this still.
-                part of ui code.
+                part of entangled ui code.
 
         if self.runs and self.should_redraw_runs:
             self.update_tables()
@@ -162,6 +154,7 @@ class CombatModule(BaseModule):
         if not self.activeRun:
             if not force:
                 return
+            pass # force save last run instnace from db.
+            #combatManager.saveRun(self.activeRun)
+        else:
             combatManager.saveRun(self.activeRun)
-        pass
-

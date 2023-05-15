@@ -130,6 +130,7 @@ class ChatLogParser(object):
         if self.reader:
             return
     
+        #TODO get from config
         self.fd = tailer.follow(open("C:/Users/ndvds/Documents/Entropia Universe/chat.log"), "r", encoding="utf_8_sig", delay=0.01)
         self.reader = threading.Thread(target=self.readLogLines, daemon=True)
         self.reader.start()

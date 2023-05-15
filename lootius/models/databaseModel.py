@@ -321,11 +321,11 @@ class MultiplierGraphData(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
-    lootInstanceCost: Mapped[float] = mapped_column(float)
-    lootInstanceValue: Mapped[float] = mapped_column(float)
+    lootInstanceCost: Mapped[float] = mapped_column(default=0)
+    lootInstanceValue: Mapped[float] = mapped_column(default=0)
 
     bp_loggingRun: Mapped["LoggingRun"] = relationship(
-        back_populates="multiplierGraphData",
+        back_populates="multiplierGraph",
     )
 
 class ReturnOverTimeGraphData(Base):
@@ -334,7 +334,7 @@ class ReturnOverTimeGraphData(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     LoggingRunID: Mapped[int] = mapped_column(ForeignKey("LoggingRun.id"))
-    returnOverTime: Mapped[float] = mapped_column(float)
+    returnOverTime: Mapped[float] = mapped_column(default=0)
 
     bp_loggingRun: Mapped["LoggingRun"] = relationship(
         back_populates="returnOverTimeGraph",
