@@ -29,14 +29,44 @@ class LootiusFrame(wx.Frame):
         # pnl = wx.Panel(self);
         # pnl.SetBackgroundColour(wx.Colour(30,30,30))
 
-        #tmp
-        mains = wx.BoxSizer(wx.HORIZONTAL)
-        buttonReset = wx.Button(self, wx.NewId(), "Reset Database")
-        mains.Add(buttonReset, wx.SizerFlags().Border(wx.TOP|wx.LEFT, 25))
+        mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.SetSizer(mains)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+
+        self.sizer_3 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Quick Stats"), wx.VERTICAL)
+        #tmp
+        buttonReset = wx.Button(self, wx.NewId(), "Reset Database")
         self.Bind(wx.EVT_BUTTON, self.resetDb, id=buttonReset.GetId())
         #end tmp
+        self.sizer_3.Add(buttonReset, wx.SizerFlags().Border(wx.TOP|wx.LEFT, 25))
+        self.sizer_3.Add((0, 0), 0, 0, 0)
+        self.sizer_3.Add((0, 0), 0, 0, 0)
+        self.sizer_3.Add((0, 0), 0, 0, 0)
+        self.sizer_3.Add((0, 0), 0, 0, 0)
+        self.panel_3 = wx.Panel(self, wx.ID_ANY)
+        sizer_2.Add(self.sizer_3, 1, wx.BOTTOM | wx.EXPAND | wx.LEFT, 5)
+        sizer_2.Add(self.panel_3, 1, wx.EXPAND, 0)
+
+        self.mainFrameSwitcher = wx.Notebook(self, wx.ID_ANY)
+
+        self.panel_2 = wx.Panel(self.mainFrameSwitcher, wx.ID_ANY)
+        self.mainFrameSwitcher.AddPage(self.panel_2, "notebook_2_pane_1")
+        self.mainFrameSwitcher_Tables = wx.Panel(self.mainFrameSwitcher, wx.ID_ANY)
+        self.mainFrameSwitcher.AddPage(self.mainFrameSwitcher_Tables, "Tables")
+        self.mainFrameSwitcher_pane_1 = wx.Panel(self.mainFrameSwitcher, wx.ID_ANY)
+        self.mainFrameSwitcher.AddPage(self.mainFrameSwitcher_pane_1, "Graphs")
+        self.mainFrameSwitcher_pane_2 = wx.Panel(self.mainFrameSwitcher, wx.ID_ANY)
+        self.mainFrameSwitcher.AddPage(self.mainFrameSwitcher_pane_2, "Detailed Stats")
+        self.mainFrameSwitcher_Page2 = wx.Panel(self.mainFrameSwitcher, wx.ID_ANY)
+        self.mainFrameSwitcher.AddPage(self.mainFrameSwitcher_Page2, "...")
+
+
+        mainSizer.Add(sizer_2, 1, wx.EXPAND, 0)
+        mainSizer.Add(self.mainFrameSwitcher, 3, wx.ALL | wx.EXPAND, 5)
+        
+
+        self.SetSizer(mainSizer)
+        # self.Layout()
 
 
         # Add menubar
@@ -103,7 +133,7 @@ class LootiusFrame(wx.Frame):
     
 
     @staticmethod
-    def goWiki():
+    def goWiki(self):
         webbrowser.open("https://github.com/nikander100/Lootius/tree/dev")
     
     def registerMenu(self):
